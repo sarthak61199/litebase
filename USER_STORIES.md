@@ -21,14 +21,14 @@ Initialize `package.json`, `tsconfig.json`, `vite.config.ts`, and `index.html` f
 
 ---
 
-## US-04 — Define shared RPC protocol types
+~~## US-04 — Define shared RPC protocol types~~
 Create `src/db/rpc/protocol.ts` with the `DbRequests` and `DbResponses` type maps keyed by method name (`init`, `query`, `ping`). Types only — no runtime code.
 
 **Acceptance:** File compiles with zero TS errors; wrong payload shapes are compile errors.
 
 ---
 
-## US-05 — Implement RPC envelope types and error serialization
+~~## US-05 — Implement RPC envelope types and error serialization~~
 Create `src/db/rpc/shared.ts` with envelope types, `SerializedError`, `PgError` class, `serializeError`, and `deserializeError`. `PgError` must preserve Postgres `code`, `detail`, `hint`, and `position`.
 
 **Acceptance:** Round-tripping a `PgError` through serialize/deserialize preserves all four PG fields; a plain `Error` round-trips without crashing.
