@@ -35,7 +35,7 @@ Create `src/db/rpc/shared.ts` with envelope types, `SerializedError`, `PgError` 
 
 ---
 
-## US-06 — Implement serveWorker (worker-side RPC router)
+~~## US-06 — Implement serveWorker (worker-side RPC router)~~
 Create `src/db/rpc/server.ts` with `serveWorker(handlers)`. It registers a single `onmessage` listener, dispatches to the correct handler by method, and posts the response or serialized error back. Exhaustive over every method in `DbRequests`.
 
 **Acceptance:** Calling an unknown method returns a serialized error; calling a known method invokes the handler and posts its result.
