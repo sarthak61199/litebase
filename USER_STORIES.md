@@ -63,7 +63,7 @@ Create `src/db/worker.ts`: instantiate `new PGlite('memory://')`, prewarm with `
 
 ---
 
-## US-25 — Set up Vitest with coverage gate
+~~## US-25 — Set up Vitest with coverage gate~~
 Configure Vitest + jsdom + v8 coverage in `vite.config.ts` (or a separate `vitest.config.ts`). Gate: 80% lines / functions / statements / branches. Exclude `rpc/protocol.ts`, `main.tsx`, and `vite-env.d.ts` from coverage.
 
 **Acceptance:** `npm run test:coverage` fails below 80% and passes at or above 80%; excluded files do not appear in the report.
