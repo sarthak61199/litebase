@@ -112,7 +112,7 @@ Create `src/db/client.ts`. On init and whenever the timeout value changes, issue
 
 ---
 
-## US-11 — Implement soft-cancel in DBClient
+~~## US-11 — Implement soft-cancel in DBClient~~
 In `DBClient.run(sql, { timeoutMs })`, create an `AbortController` and a main-thread timer. When cancelled or timed out, immediately reject the pending promise so the UI updates instantly, without waiting for the worker.
 
 **Acceptance:** Cancelling a running query resolves the UI promise as rejected within one JS event-loop tick; the worker may still be executing in the background.

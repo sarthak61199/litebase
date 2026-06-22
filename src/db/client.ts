@@ -18,6 +18,8 @@ export class DBClient {
   private timeoutMs: number;
   private readonly listeners = new Set<(event: DbClientEvent) => void>();
   private runCounter = 0;
+  private currentAc: AbortController | null = null;
+  private currentRunId: string | null = null;
 
   constructor(rpc: WorkerRpc, timeoutMs = 10_000) {
     this.rpc = rpc;
@@ -48,20 +50,46 @@ export class DBClient {
     await this.applyTimeout();
   }
 
-  async run(sql: string): Promise<QueryResult> {
+  async run(sql: string, options: { timeoutMs?: number } = {}): Promise<QueryResult> {
     const runId = String(++this.runCounter);
+    const perCallMs = options.timeoutMs ?? this.timeoutMs;
+
+    const ac = new AbortController();
+    this.currentAc = ac;
+    this.currentRunId = runId;
+
+    let softTimer: ReturnType<typeof setTimeout> | undefined;
+    if (perCallMs > 0) {
+      softTimer = setTimeout(() => {
+        ac.abort(new Error(`Query timed out after ${perCallMs}ms`));
+      }, perCallMs);
+    }
+
     this.emit({ type: 'run:begin', runId });
     const t0 = performance.now();
     try {
-      const result = await this.rpc.call('query', { sql });
+      const result = await this.rpc.call('query', { sql }, { signal: ac.signal });
+      clearTimeout(softTimer);
       const durationMs = performance.now() - t0;
       this.emit({ type: 'run:succeed', runId, result, durationMs });
       return result;
     } catch (err) {
+      clearTimeout(softTimer);
       const durationMs = performance.now() - t0;
       const error = err instanceof Error ? err : new Error(String(err));
       this.emit({ type: 'run:fail', runId, error, durationMs });
       throw error;
+    } finally {
+      if (this.currentRunId === runId) {
+        this.currentAc = null;
+        this.currentRunId = null;
+      }
     }
+  }
+
+  cancel(): void {
+    if (!this.currentAc || !this.currentRunId) return;
+    this.emit({ type: 'run:cancelling', runId: this.currentRunId });
+    this.currentAc.abort(new Error('Cancelled by user'));
   }
 }
