@@ -105,7 +105,7 @@ Write a Vitest integration test (Node, real PGlite) asserting that `createHandle
 
 ---
 
-## US-10 — Apply session-level statement_timeout in DBClient
+~~## US-10 — Apply session-level statement_timeout in DBClient~~
 Create `src/db/client.ts`. On init and whenever the timeout value changes, issue `SET statement_timeout = <ms>` as a session-level command (not inside a transaction wrapper, so user SQL is semantically untouched).
 
 **Acceptance:** A query that exceeds the timeout is cancelled by Postgres (if statement_timeout fires); the SET is not wrapped in BEGIN/COMMIT.
