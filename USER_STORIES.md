@@ -70,14 +70,14 @@ Configure Vitest + jsdom + v8 coverage in `vite.config.ts` (or a separate `vites
 
 ---
 
-## US-26 — Unit test: RPC error serialization
+~~## US-26 — Unit test: RPC error serialization~~
 Write Vitest tests for `serializeError` / `deserializeError` in `rpc/shared.ts`. Cover: `PgError` round-trip preserving `code/detail/hint/position`; plain `Error` round-trip; non-Error value normalization.
 
 **Acceptance:** All cases pass; no mocks needed (pure functions).
 
 ---
 
-## US-27 — Unit test: WorkerRpc with FakeWorker
+~~## US-27 — Unit test: WorkerRpc with FakeWorker~~
 Write Vitest tests for `WorkerRpc` (`rpc/client.ts`) using an injected `FakeWorker`. Cover: ID correlation, per-call timeout cleanup, `AbortSignal` cancellation, `terminate()`/`restart()` rejecting all pending promises, and stale-generation responses being silently dropped.
 
 **Acceptance:** All cases pass without a real Worker or browser environment.
