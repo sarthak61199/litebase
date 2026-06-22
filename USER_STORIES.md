@@ -42,7 +42,7 @@ Create `src/db/rpc/server.ts` with `serveWorker(handlers)`. It registers a singl
 
 ---
 
-## US-07 — Implement WorkerRpc (main-thread RPC client)
+~~## US-07 — Implement WorkerRpc (main-thread RPC client)~~
 Create `src/db/rpc/client.ts` with `WorkerRpc`: message-ID correlation, a pending-promise map, per-call `timeoutMs` and `AbortSignal` support, and `terminate()` + `restart()` that call `rejectAll(reason)` so no promise dangles after a hard stop. Fresh worker instance per generation prevents stale responses resolving new calls.
 
 **Acceptance:** A call that times out rejects its promise; `terminate()` rejects all pending calls; a response from a terminated generation is silently dropped.
