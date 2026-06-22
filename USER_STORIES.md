@@ -98,7 +98,7 @@ Write a Vitest integration test (Node, real `memory://` PGlite) for `createHandl
 
 ---
 
-## US-37 — Integration test: row cap enforced
+~~## US-37 — Integration test: row cap enforced~~
 Write a Vitest integration test (Node, real PGlite) asserting that `createHandlers` returns exactly 10 000 rows for a query that produces more, with `capped: true` and `totalRows > 10000`.
 
 **Acceptance:** Row count is exactly the cap; `capped` flag is true; test runs in Node without a Worker.
