@@ -51,6 +51,8 @@ The hardest, least-certain part was in-flight cancellation under single-threaded
 - `terminate()` + respawn takes ~1035ms avg (803-1203ms) in Node with cold wasm; expected faster in-browser once `.wasm` is cached. Treat ~1s as a conservative upper bound.
 - Conclusion: the three-layer design is validated and worth building. Soft-cancel is the instant primary UX; `statement_timeout` is free best-effort for cooperative/`pg_sleep` work (not part of the contract); hard-stop is the guaranteed fallback. Because respawn is ~1s and wipes the DB, the `restarting` state must appear immediately and Run stays disabled until `ready` - these are required, not optional.
 
+**US-38 follow-up (integration test, 2026-06-22):** Confirmed `statement_timeout` does NOT fire for `pg_sleep` either — `pg_sleep(3)` ran to full completion despite `statement_timeout = 300ms`. Root cause: PGlite executes all Postgres SQL synchronously inside WASM; even a yielding function like `pg_sleep` blocks the host JS/WASM event loop, so the interrupt signal is never delivered. **Layer 2 is a complete no-op in PGlite.** The design now has two effective layers: soft-cancel (layer 1) and hard-stop (layer 3). The `SET statement_timeout` call and the `init` RPC method it required are being removed (US-46).
+
 ## Stack
 - React + Vite + TypeScript
 - `@electric-sql/pglite` (PostgreSQL 17 in WASM), run in a custom Web Worker
@@ -72,13 +74,13 @@ flowchart LR
 ```
 
 ## Cancellation + timeout strategy (the core design)
-Honest framing: PGlite executes Postgres synchronously on the worker thread, so while a CPU-bound query runs the worker's message loop is blocked - it can't process a "cancel" message, and the `statement_timeout` timer often can't be delivered mid-execution. So a query can ALWAYS be stopped, but the only guaranteed stop resets the in-memory DB. Three layers, weakest-but-cheapest to strongest:
+Honest framing: PGlite executes all Postgres SQL synchronously inside WASM — including `pg_sleep` — so the host JS event loop is fully blocked for the duration of any query. No JS timer or signal can interrupt a running query from outside. So a query can ALWAYS be stopped, but the only guaranteed stop resets the in-memory DB. Two effective layers:
 
-1. Soft cancel (instant UX, main-thread only): each run gets an `AbortController` + timer on the main thread. Cancel/timeout immediately rejects the pending promise so the UI shows "cancelled/timed out" and stays responsive. The worker may still be busy in the background.
-2. Server-side `statement_timeout` (best-effort, no data loss when it fires): set once at the session level via `SET statement_timeout = <ms>` (updated when the user changes the value) - NOT a per-query transaction wrapper, so the user's SQL is left semantically untouched (no implicit BEGIN/COMMIT that would break VACUUM / CREATE INDEX CONCURRENTLY / user BEGIN). Aborts cleanly for queries that hit a Postgres interrupt check, but is unreliable for exactly the tight CPU loops we most want to kill.
-3. Hard stop (the only guaranteed stop): if the worker is still occupied past a short grace period, the client calls `worker.terminate()` and spawns a fresh in-memory worker (~1s, measured). Because the DB is `memory://`, this wipes the session's tables - an accepted v1 trade for max speed/ephemerality. The engine enters `restarting` immediately so the user sees feedback (not a frozen button), the UI clearly warns that force-stop resets the database, and Run is disabled until the new worker reports `ready`.
+1. **Soft cancel (instant UX, main-thread only):** each run gets an `AbortController` + timer on the main thread. Cancel/timeout immediately rejects the pending promise so the UI shows "cancelled/timed out" and stays responsive. The worker is still busy in the background.
+2. ~~Server-side `statement_timeout`~~ **Removed (US-46):** empirically confirmed to be a complete no-op in PGlite. `SET statement_timeout` is accepted by Postgres but the interrupt is never delivered because WASM blocks the event loop for ALL query types (both CPU-bound cross-joins and cooperative `pg_sleep`). The `init` handler and its `timeoutMs` param have been removed.
+3. **Hard stop (the only guaranteed stop):** if the worker is still occupied past a short grace period, the client calls `worker.terminate()` and spawns a fresh in-memory worker (~1s, measured). Because the DB is `memory://`, this wipes the session's tables — an accepted v1 trade for max speed/ephemerality. The engine enters `restarting` immediately so the user sees feedback (not a frozen button), the UI clearly warns that force-stop resets the database, and Run is disabled until the new worker reports `ready`.
 
-Spike-confirmed (see `spikes/cancellation/SPIKE_REPORT.md`): `statement_timeout` does not fire for CPU-bound queries, so layer 2 is best-effort only and the guaranteed path is layer 3 (~1s, with reset).
+Spike + US-38 integration test confirmed: `statement_timeout` fires for neither CPU-bound queries nor `pg_sleep`. The only effective cancellation paths are layer 1 (soft-cancel, instant) and layer 3 (hard-stop, ~1s, resets DB).
 
 ```mermaid
 sequenceDiagram

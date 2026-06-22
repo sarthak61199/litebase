@@ -133,17 +133,32 @@ In `DBClient`, after a soft-cancel, poll a short grace period. If the worker is 
 
 ---
 
-## US-29 — Unit test: DBClient cancellation and timeout logic
+~~## US-29 — Unit test: DBClient cancellation and timeout logic~~
 Write Vitest tests for `DBClient` (`db/client.ts`) using a mock `WorkerRpc` and `vi.useFakeTimers()`. Cover: session `statement_timeout` applied on init, successful run, error run, soft-cancel, timeout-to-cancel sequence, hard-stop terminate + respawn sequence, and single-in-flight rejection.
 
 **Acceptance:** All cases pass with fake timers; no real Worker.
 
 ---
 
-## US-38 — Integration test: statement_timeout behavior
+~~## US-38 — Integration test: statement_timeout behavior~~
 Write a Vitest integration test (Node, real PGlite) covering both the spike cases: (1) `pg_sleep`-based query with `statement_timeout` — assert it aborts; (2) CPU-bound cross-join with `statement_timeout` — record whether it aborts or runs to completion, and print the verdict (this is documentation, not a pass/fail assertion).
 
 **Acceptance:** Test runs without hanging; the `pg_sleep` case aborts; the cross-join verdict is printed to the test output.
+
+---
+
+## US-46 — Remove layer 2: delete statement_timeout wiring
+US-38 integration tests confirmed `statement_timeout` is a complete no-op in PGlite — the interrupt is never delivered for any query type (neither CPU-bound nor `pg_sleep`) because WASM blocks the JS event loop synchronously. Remove all dead code before building the frontend.
+
+Changes required:
+- `src/db/handlers.ts` — delete the `init` handler entirely; remove it from the `Handlers` return type.
+- `src/db/rpc/protocol.ts` — remove the `init` entry from `DbRequests` and `DbResponses`.
+- `src/db/client.ts` — remove the `rpc.call('init', ...)` call and any `timeoutMs`-to-worker wiring; `DBClient` still accepts `timeoutMs` on `run()` for the main-thread soft-cancel timer, but never sends it to the worker.
+- `__tests__/db/handlers.test.ts` — delete the `init: applies statement_timeout` test case.
+- `__tests__/db/client.test.ts` — remove assertions that verify `init` is called on the worker.
+- Update `CLAUDE.md` layer description to match the two-layer reality.
+
+**Acceptance:** `npm run test` passes; no reference to `init` RPC or `SET statement_timeout` remains in `src/`; TypeScript compiles clean.
 
 ---
 
