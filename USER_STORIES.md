@@ -63,6 +63,48 @@ Create `src/db/worker.ts`: instantiate `new PGlite('memory://')`, prewarm with `
 
 ---
 
+## US-25 — Set up Vitest with coverage gate
+Configure Vitest + jsdom + v8 coverage in `vite.config.ts` (or a separate `vitest.config.ts`). Gate: 80% lines / functions / statements / branches. Exclude `rpc/protocol.ts`, `main.tsx`, and `vite-env.d.ts` from coverage.
+
+**Acceptance:** `npm run test:coverage` fails below 80% and passes at or above 80%; excluded files do not appear in the report.
+
+---
+
+## US-26 — Unit test: RPC error serialization
+Write Vitest tests for `serializeError` / `deserializeError` in `rpc/shared.ts`. Cover: `PgError` round-trip preserving `code/detail/hint/position`; plain `Error` round-trip; non-Error value normalization.
+
+**Acceptance:** All cases pass; no mocks needed (pure functions).
+
+---
+
+## US-27 — Unit test: WorkerRpc with FakeWorker
+Write Vitest tests for `WorkerRpc` (`rpc/client.ts`) using an injected `FakeWorker`. Cover: ID correlation, per-call timeout cleanup, `AbortSignal` cancellation, `terminate()`/`restart()` rejecting all pending promises, and stale-generation responses being silently dropped.
+
+**Acceptance:** All cases pass without a real Worker or browser environment.
+
+---
+
+## US-28 — Unit test: serveWorker routing
+Write Vitest tests for `serveWorker` (`rpc/server.ts`). Cover: known method routes to the handler and posts the result; unknown method posts a serialized error; handler rejection is serialized and posted.
+
+**Acceptance:** All cases pass; no real Worker environment needed.
+
+---
+
+## US-36 — Integration test: createHandlers DDL + DML + SELECT
+Write a Vitest integration test (Node, real `memory://` PGlite) for `createHandlers`. Cover: CREATE TABLE, INSERT, SELECT returning correct `fields` and `rows` in `rowMode: 'array'`; a query error returns a `PgError` with a Postgres `code`.
+
+**Acceptance:** Runs against real PGlite in Node without a Worker; all assertions pass.
+
+---
+
+## US-37 — Integration test: row cap enforced
+Write a Vitest integration test (Node, real PGlite) asserting that `createHandlers` returns exactly 10 000 rows for a query that produces more, with `capped: true` and `totalRows > 10000`.
+
+**Acceptance:** Row count is exactly the cap; `capped` flag is true; test runs in Node without a Worker.
+
+---
+
 ## US-10 — Apply session-level statement_timeout in DBClient
 Create `src/db/client.ts`. On init and whenever the timeout value changes, issue `SET statement_timeout = <ms>` as a session-level command (not inside a transaction wrapper, so user SQL is semantically untouched).
 
@@ -88,6 +130,20 @@ In `DBClient`, after a soft-cancel, poll a short grace period. If the worker is 
 `DBClient.run()` must reject immediately if a query is already in flight, rather than queuing a second call.
 
 **Acceptance:** Calling `run()` twice concurrently causes the second call to reject with an `AlreadyRunningError` (or equivalent).
+
+---
+
+## US-29 — Unit test: DBClient cancellation and timeout logic
+Write Vitest tests for `DBClient` (`db/client.ts`) using a mock `WorkerRpc` and `vi.useFakeTimers()`. Cover: session `statement_timeout` applied on init, successful run, error run, soft-cancel, timeout-to-cancel sequence, hard-stop terminate + respawn sequence, and single-in-flight rejection.
+
+**Acceptance:** All cases pass with fake timers; no real Worker.
+
+---
+
+## US-38 — Integration test: statement_timeout behavior
+Write a Vitest integration test (Node, real PGlite) covering both the spike cases: (1) `pg_sleep`-based query with `statement_timeout` — assert it aborts; (2) CPU-bound cross-join with `statement_timeout` — record whether it aborts or runs to completion, and print the verdict (this is documentation, not a pass/fail assertion).
+
+**Acceptance:** Test runs without hanging; the `pg_sleep` case aborts; the cross-join verdict is printed to the test output.
 
 ---
 
@@ -119,6 +175,13 @@ Create `src/stores/settingsStore.ts` (Zustand). State: `timeoutMs: number` (defa
 
 ---
 
+## US-30 — Unit test: store transitions
+Write Vitest tests for each Zustand store (`engineStore`, `editorStore`, `resultStore`, `settingsStore`). Cover every setter and all valid phase transitions in `resultStore`.
+
+**Acceptance:** All stores tested in isolation; no cross-store imports in test files.
+
+---
+
 ## US-18 — Wire DBClient events to stores in db/bindings.ts
 Create `src/db/bindings.ts`: subscribe to `DBClient` events and route each to the correct store setter (`engine:booting` → `useEngineStore`, `run:begin` → `useResultStore.beginRun`, etc.). This must be the only place that couples events to stores.
 
@@ -126,10 +189,24 @@ Create `src/db/bindings.ts`: subscribe to `DBClient` events and route each to th
 
 ---
 
+## US-31 — Unit test: db/bindings event routing
+Write Vitest tests for `db/bindings.ts`. For each `DBClient` event, assert the correct store setter is called and no other store is mutated.
+
+**Acceptance:** All event-to-store routes covered; stores are real (not mocked) to catch selector mistakes.
+
+---
+
 ## US-19 — Implement useRunController hook
 Create `src/hooks/useRunController.ts`. Read `sql` from `useEditorStore` and `timeoutMs` from `useSettingsStore`. Expose `run()` and `cancel()`. `run()` calls `DBClient.run(sql, { timeoutMs })`; `cancel()` calls `DBClient.cancel()`. This is the only hook that reads multiple stores and drives the client.
 
 **Acceptance:** `run()` triggers a query with the current sql and timeout; `cancel()` calls the client cancel without touching stores directly.
+
+---
+
+## US-35 — Component test: useRunController orchestration
+Write RTL tests for `useRunController`. Cover: `run()` calls `DBClient.run` with sql + timeout; `cancel()` calls `DBClient.cancel`; hook does not call store setters directly.
+
+**Acceptance:** Orchestration paths covered; `DBClient` is mocked at the interface boundary.
 
 ---
 
@@ -168,55 +245,6 @@ When the engine status transitions to `restarting` (hard-stop triggered), displa
 
 ---
 
-## US-25 — Set up Vitest with coverage gate
-Configure Vitest + jsdom + v8 coverage in `vite.config.ts` (or a separate `vitest.config.ts`). Gate: 80% lines / functions / statements / branches. Exclude `rpc/protocol.ts`, `main.tsx`, and `vite-env.d.ts` from coverage.
-
-**Acceptance:** `npm run test:coverage` fails below 80% and passes at or above 80%; excluded files do not appear in the report.
-
----
-
-## US-26 — Unit test: RPC error serialization
-Write Vitest tests for `serializeError` / `deserializeError` in `rpc/shared.ts`. Cover: `PgError` round-trip preserving `code/detail/hint/position`; plain `Error` round-trip; non-Error value normalization.
-
-**Acceptance:** All cases pass; no mocks needed (pure functions).
-
----
-
-## US-27 — Unit test: WorkerRpc with FakeWorker
-Write Vitest tests for `WorkerRpc` (`rpc/client.ts`) using an injected `FakeWorker`. Cover: ID correlation, per-call timeout cleanup, `AbortSignal` cancellation, `terminate()`/`restart()` rejecting all pending promises, and stale-generation responses being silently dropped.
-
-**Acceptance:** All cases pass without a real Worker or browser environment.
-
----
-
-## US-28 — Unit test: serveWorker routing
-Write Vitest tests for `serveWorker` (`rpc/server.ts`). Cover: known method routes to the handler and posts the result; unknown method posts a serialized error; handler rejection is serialized and posted.
-
-**Acceptance:** All cases pass; no real Worker environment needed.
-
----
-
-## US-29 — Unit test: DBClient cancellation and timeout logic
-Write Vitest tests for `DBClient` (`db/client.ts`) using a mock `WorkerRpc` and `vi.useFakeTimers()`. Cover: session `statement_timeout` applied on init, successful run, error run, soft-cancel, timeout-to-cancel sequence, hard-stop terminate + respawn sequence, and single-in-flight rejection.
-
-**Acceptance:** All cases pass with fake timers; no real Worker.
-
----
-
-## US-30 — Unit test: store transitions
-Write Vitest tests for each Zustand store (`engineStore`, `editorStore`, `resultStore`, `settingsStore`). Cover every setter and all valid phase transitions in `resultStore`.
-
-**Acceptance:** All stores tested in isolation; no cross-store imports in test files.
-
----
-
-## US-31 — Unit test: db/bindings event routing
-Write Vitest tests for `db/bindings.ts`. For each `DBClient` event, assert the correct store setter is called and no other store is mutated.
-
-**Acceptance:** All event-to-store routes covered; stores are real (not mocked) to catch selector mistakes.
-
----
-
 ## US-32 — Component test: Toolbar rendering and interaction
 Write RTL tests for `Toolbar.tsx`. Cover: Run disabled when `phase !== 'idle'`; Cancel enabled when `phase === 'running'`; timeout input updates `useSettingsStore`; timing and row count render after a result.
 
@@ -235,34 +263,6 @@ Write RTL tests for `ResultsTable.tsx`. Cover: columns from `fields`, rows rende
 Write RTL tests for `Editor.tsx`. Cover: value change propagates to `useEditorStore`; `Cmd+Enter` and `Ctrl+Enter` call `controller.run()`.
 
 **Acceptance:** Both shortcuts fire `run`; value sync works.
-
----
-
-## US-35 — Component test: useRunController orchestration
-Write RTL tests for `useRunController`. Cover: `run()` calls `DBClient.run` with sql + timeout; `cancel()` calls `DBClient.cancel`; hook does not call store setters directly.
-
-**Acceptance:** Orchestration paths covered; `DBClient` is mocked at the interface boundary.
-
----
-
-## US-36 — Integration test: createHandlers DDL + DML + SELECT
-Write a Vitest integration test (Node, real `memory://` PGlite) for `createHandlers`. Cover: CREATE TABLE, INSERT, SELECT returning correct `fields` and `rows` in `rowMode: 'array'`; a query error returns a `PgError` with a Postgres `code`.
-
-**Acceptance:** Runs against real PGlite in Node without a Worker; all assertions pass.
-
----
-
-## US-37 — Integration test: row cap enforced
-Write a Vitest integration test (Node, real PGlite) asserting that `createHandlers` returns exactly 10 000 rows for a query that produces more, with `capped: true` and `totalRows > 10000`.
-
-**Acceptance:** Row count is exactly the cap; `capped` flag is true; test runs in Node without a Worker.
-
----
-
-## US-38 — Integration test: statement_timeout behavior
-Write a Vitest integration test (Node, real PGlite) covering both the spike cases: (1) `pg_sleep`-based query with `statement_timeout` — assert it aborts; (2) CPU-bound cross-join with `statement_timeout` — record whether it aborts or runs to completion, and print the verdict (this is documentation, not a pass/fail assertion).
-
-**Acceptance:** Test runs without hanging; the `pg_sleep` case aborts; the cross-join verdict is printed to the test output.
 
 ---
 
