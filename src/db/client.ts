@@ -1,6 +1,13 @@
 import type { DbResponses } from './rpc/protocol';
 import type { WorkerRpc } from './rpc/client';
 
+export class AlreadyRunningError extends Error {
+  constructor() {
+    super('A query is already in flight');
+    this.name = 'AlreadyRunningError';
+  }
+}
+
 export type QueryResult = DbResponses['query'];
 
 export type DbClientEvent =
@@ -57,6 +64,9 @@ export class DBClient {
   async run(sql: string, options: { timeoutMs?: number } = {}): Promise<QueryResult> {
     if (this.restarting) {
       throw new Error('Engine is restarting; please wait for ready');
+    }
+    if (this.currentRunId !== null) {
+      throw new AlreadyRunningError();
     }
 
     const runId = String(++this.runCounter);

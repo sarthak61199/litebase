@@ -126,7 +126,7 @@ In `DBClient`, after a soft-cancel, poll a short grace period. If the worker is 
 
 ---
 
-## US-13 — Enforce single in-flight query in DBClient
+~~## US-13 — Enforce single in-flight query in DBClient~~
 `DBClient.run()` must reject immediately if a query is already in flight, rather than queuing a second call.
 
 **Acceptance:** Calling `run()` twice concurrently causes the second call to reject with an `AlreadyRunningError` (or equivalent).
