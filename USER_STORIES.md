@@ -49,7 +49,7 @@ Create `src/db/rpc/client.ts` with `WorkerRpc`: message-ID correlation, a pendin
 
 ---
 
-## US-08 — Implement createHandlers (pure PGlite handler factory)
+~~## US-08 — Implement createHandlers (pure PGlite handler factory)~~
 Create `src/db/handlers.ts` with `createHandlers(db)` returning `init`, `query`, and `ping` handlers. `query` uses `rowMode: 'array'` and applies a hard row cap (default 10 000), returning `{ fields, rows, totalRows, capped }`.
 
 **Acceptance:** Running against a real `memory://` PGlite in Node: DDL + DML + SELECT round-trips correctly; a query returning 20 000 rows returns exactly 10 000 with `capped: true`.
