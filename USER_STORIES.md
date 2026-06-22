@@ -56,7 +56,7 @@ Create `src/db/handlers.ts` with `createHandlers(db)` returning `init`, `query`,
 
 ---
 
-## US-09 — Implement the PGlite Web Worker
+~~## US-09 — Implement the PGlite Web Worker~~
 Create `src/db/worker.ts`: instantiate `new PGlite('memory://')`, prewarm with `SELECT 1`, then call `serveWorker(createHandlers(db))`. The worker must post a `ready` signal after prewarm.
 
 **Acceptance:** After the worker is constructed and `ready` is received, a `ping` call returns successfully.
