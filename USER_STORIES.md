@@ -91,7 +91,7 @@ Write Vitest tests for `serveWorker` (`rpc/server.ts`). Cover: known method rout
 
 ---
 
-## US-36 — Integration test: createHandlers DDL + DML + SELECT
+~~## US-36 — Integration test: createHandlers DDL + DML + SELECT~~
 Write a Vitest integration test (Node, real `memory://` PGlite) for `createHandlers`. Cover: CREATE TABLE, INSERT, SELECT returning correct `fields` and `rows` in `rowMode: 'array'`; a query error returns a `PgError` with a Postgres `code`.
 
 **Acceptance:** Runs against real PGlite in Node without a Worker; all assertions pass.
