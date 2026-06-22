@@ -7,6 +7,7 @@ export default defineConfig({
     format: "es",
   },
   test: {
+    include: ["__tests__/**/*.test.{ts,tsx}"],
     environment: "jsdom",
     coverage: {
       provider: "v8",
@@ -20,11 +21,11 @@ export default defineConfig({
         "src/db/rpc/protocol.ts",
         "src/main.tsx",
         "src/vite-env.d.ts",
-        // standard excludes
         "node_modules/**",
         "dist/**",
         "**/*.config.*",
         "**/*.d.ts",
+        "__tests__/**",
       ],
     },
   },
