@@ -1,5 +1,5 @@
 {
-  "name": "sql-fig",
+  "name": "litebase",
   "private": true,
   "type": "module",
   "scripts": {
