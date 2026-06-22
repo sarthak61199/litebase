@@ -13,6 +13,9 @@ export type DbClientEvent =
   | { type: 'run:fail'; runId: string; error: Error; durationMs: number }
   | { type: 'run:cancelling'; runId: string };
 
+// How long to wait for a post-cancel ping before declaring the worker stuck.
+const HARD_STOP_GRACE_MS = 500;
+
 export class DBClient {
   private readonly rpc: WorkerRpc;
   private timeoutMs: number;
@@ -20,6 +23,7 @@ export class DBClient {
   private runCounter = 0;
   private currentAc: AbortController | null = null;
   private currentRunId: string | null = null;
+  private restarting = false;
 
   constructor(rpc: WorkerRpc, timeoutMs = 10_000) {
     this.rpc = rpc;
@@ -51,6 +55,10 @@ export class DBClient {
   }
 
   async run(sql: string, options: { timeoutMs?: number } = {}): Promise<QueryResult> {
+    if (this.restarting) {
+      throw new Error('Engine is restarting; please wait for ready');
+    }
+
     const runId = String(++this.runCounter);
     const perCallMs = options.timeoutMs ?? this.timeoutMs;
 
@@ -78,6 +86,9 @@ export class DBClient {
       const durationMs = performance.now() - t0;
       const error = err instanceof Error ? err : new Error(String(err));
       this.emit({ type: 'run:fail', runId, error, durationMs });
+      if (ac.signal.aborted) {
+        void this.maybeHardStop();
+      }
       throw error;
     } finally {
       if (this.currentRunId === runId) {
@@ -91,5 +102,30 @@ export class DBClient {
     if (!this.currentAc || !this.currentRunId) return;
     this.emit({ type: 'run:cancelling', runId: this.currentRunId });
     this.currentAc.abort(new Error('Cancelled by user'));
+  }
+
+  // Probes the worker after a soft-cancel. If it responds within the grace
+  // period the worker freed itself (statement_timeout fired). If not, we
+  // terminate and respawn — the only guaranteed stop.
+  private async maybeHardStop(): Promise<void> {
+    this.restarting = true;
+    try {
+      await this.rpc.call('ping', {}, { timeoutMs: HARD_STOP_GRACE_MS });
+      // Worker responded — it freed itself, no restart needed.
+      this.restarting = false;
+    } catch {
+      // Worker did not respond in time — terminate and respawn.
+      this.emit({ type: 'engine:restarting' });
+      this.rpc.restart();
+      try {
+        await this.applyTimeout();
+        this.emit({ type: 'engine:ready' });
+      } catch (bootErr) {
+        const error = bootErr instanceof Error ? bootErr : new Error(String(bootErr));
+        this.emit({ type: 'engine:crashed', error });
+      } finally {
+        this.restarting = false;
+      }
+    }
   }
 }

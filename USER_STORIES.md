@@ -119,7 +119,7 @@ In `DBClient.run(sql, { timeoutMs })`, create an `AbortController` and a main-th
 
 ---
 
-## US-12 — Implement hard-stop (terminate + respawn) in DBClient
+~~## US-12 — Implement hard-stop (terminate + respawn) in DBClient~~
 In `DBClient`, after a soft-cancel, poll a short grace period. If the worker is still busy, call `worker.terminate()`, reject all pending RPC promises, and spawn a fresh `memory://` worker. Emit an `engine:restarting` then `engine:ready` event sequence.
 
 **Acceptance:** After a hard stop, the engine emits `ready`, a new query can run, and tables created before the stop are gone.
