@@ -84,7 +84,7 @@ Write Vitest tests for `WorkerRpc` (`rpc/client.ts`) using an injected `FakeWork
 
 ---
 
-## US-28 — Unit test: serveWorker routing
+~~## US-28 — Unit test: serveWorker routing~~
 Write Vitest tests for `serveWorker` (`rpc/server.ts`). Cover: known method routes to the handler and posts the result; unknown method posts a serialized error; handler rejection is serialized and posted.
 
 **Acceptance:** All cases pass; no real Worker environment needed.
