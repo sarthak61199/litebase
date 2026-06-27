@@ -14,3 +14,5 @@ __unconfig*
 todos.json
 .claude
 .cursor
+test-results
+playwright-report

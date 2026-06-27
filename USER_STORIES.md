@@ -288,6 +288,13 @@ Write RTL tests for `Editor.tsx`. Cover: value change propagates to `useEditorSt
 
 ---
 
+~~## US-48 — Set up Playwright for E2E tests~~
+Install and configure Playwright for end-to-end testing against the Vite dev/preview server. Install `@playwright/test`, add an `npm run test:e2e` script, and write a `playwright.config.ts` that targets `localhost:3000` (or uses `webServer` to auto-start `npm run preview`). Configure a single Chromium project. Place E2E tests in `e2e/`.
+
+**Acceptance:** `npm run test:e2e` launches the preview server, opens a Chromium browser, and a trivial smoke test (`page.goto('/')` + title assertion) passes; no existing unit/integration tests are broken.
+
+---
+
 ## US-39 — E2E test: boot to ready and run a query
 Write a Playwright test: load the app, wait for engine status `ready`, type a SELECT, click Run, assert results appear in the table.
 
