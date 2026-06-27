@@ -176,7 +176,7 @@ Create `src/stores/editorStore.ts` (Zustand). State: `sql: string` and `setSql(s
 
 ---
 
-## US-16 — Implement useResultStore
+~~## US-16 — Implement useResultStore~~
 Create `src/stores/resultStore.ts` (Zustand). State: `phase: 'idle' | 'running' | 'cancelling'`, `runId`, `result`, `error`, `durationMs`. Setters: `beginRun`, `succeed`, `fail`, `cancelling`, `reset`.
 
 **Acceptance:** Each setter drives the correct phase transition; invalid transitions (e.g. `succeed` when idle) do not corrupt state.
