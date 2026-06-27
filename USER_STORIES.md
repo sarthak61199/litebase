@@ -204,7 +204,7 @@ Create `src/db/bindings.ts`: subscribe to `DBClient` events and route each to th
 
 ---
 
-## US-31 — Unit test: db/bindings event routing
+~~## US-31 — Unit test: db/bindings event routing~~
 Write Vitest tests for `db/bindings.ts`. For each `DBClient` event, assert the correct store setter is called and no other store is mutated.
 
 **Acceptance:** All event-to-store routes covered; stores are real (not mocked) to catch selector mistakes.
