@@ -40,6 +40,9 @@ React UI → DBClient (main thread) → WorkerRpc → Web Worker → PGlite (mem
 | PGlite handlers | `src/db/handlers.ts` | `createHandlers(db)` — `query` (row cap), `ping` |
 | Worker entry | `src/db/worker.ts` | Instantiates PGlite, prewarms with `SELECT 1`, calls `serveWorker` |
 | DBClient | `src/db/client.ts` | Orchestrates the two-layer cancellation strategy; emits typed events |
+| Bindings | `src/db/bindings.ts` | `bindClientToStores(client)` — subscribes to DBClient events and routes to Zustand stores |
+| Stores | `src/stores/` | Zustand stores: `engineStore` (status), `resultStore` (phase/result/error), `editorStore` (sql), `settingsStore` (timeoutMs) |
+| Run hook | `src/hooks/useRunController.ts` | `useRunController(client)` — reads sql+timeoutMs from stores, delegates to `client.run`/`client.cancel` |
 
 ### Cancellation strategy (the core design)
 
@@ -73,4 +76,9 @@ Coverage excludes `src/db/rpc/protocol.ts`, `src/main.tsx`, `src/vite-env.d.ts`.
 
 ## Remaining work (USER_STORIES.md)
 
-The unfinished user stories are US-46 (done) and US-14 onward. The `src/` currently has no Zustand stores, no React components (besides a stub `App`), no `bindings.ts`, and no `useRunController`. The `DBClient` and entire `src/db/` layer are complete and tested.
+The entire `src/db/` layer, Zustand stores, `bindings.ts`, and `useRunController` are complete and tested. `src/app.tsx` is still a stub. What remains:
+
+- **UI components** (US-20–24): CodeMirror SQL editor, virtualized results table, toolbar, App layout/global styles, hard-stop warning
+- **Component tests** (US-32–34): Toolbar, ResultsTable, editor keyboard shortcut
+- **E2E tests** (US-39–43): boot→query, cancel/recover, timeout recovery, force-stop DB reset, row-cap enforcement
+- **Deploy** (US-44–45): S3 upload with correct content types, CloudFront invalidation
