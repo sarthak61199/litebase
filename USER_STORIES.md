@@ -239,7 +239,7 @@ Create `src/components/Editor.tsx`: CodeMirror 6 with `@codemirror/lang-sql` Pos
 
 ---
 
-## US-21 — Build virtualized results table
+~~## US-21 — Build virtualized results table~~
 Create `src/components/ResultsTable.tsx` using `@tanstack/react-virtual`. Render rows from `rowMode: 'array'` using `fields` metadata for column headers. Handle: empty result, affected-rows (no SELECT), error state, and row-cap "Showing first N of M rows" banner. Memoize row rendering.
 
 **Acceptance:** A 10 000-row result renders without jank; only visible rows are in the DOM; the cap banner appears when `capped: true`.
@@ -254,7 +254,7 @@ Create `src/components/Toolbar.tsx`. Show: Run button (disabled while running/re
 ---
 
 ## US-23 — Build App layout and global styles
-Create `src/App.tsx`, `src/main.tsx`, and `src/styles.css`. Layout: editor on top, results below, toolbar across the top. Clean modern appearance (no framework dependency — plain CSS is fine).
+Create `src/App.tsx`, `src/main.tsx`, and `src/styles.css`. Layout: editor on top, results below, toolbar across the top. Clean modern appearance.
 
 **Acceptance:** The app renders all three panels without layout overflow; it looks presentable on a 1280×800 viewport.
 

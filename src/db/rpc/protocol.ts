@@ -12,6 +12,7 @@ export interface DbResponses {
     rows: unknown[][];
     totalRows: number;
     capped: boolean;
+    affectedRows?: number;
   };
   ping: {
     ok: true;

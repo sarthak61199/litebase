@@ -39,6 +39,7 @@ export function createHandlers(db: PGlite): Handlers {
           rows: capped ? rows.slice(0, cap) : rows,
           totalRows,
           capped,
+          affectedRows: result.affectedRows,
         };
       } catch (err) {
         liftPgError(err);
