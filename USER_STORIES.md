@@ -302,7 +302,7 @@ Write a Playwright test: load the app, wait for engine status `ready`, type a SE
 
 ---
 
-## US-40 — E2E test: cancel a runaway query and recover
+~~## US-40 — E2E test: cancel a runaway query and recover~~
 Write a Playwright test: run a long-running query (e.g. `pg_sleep(60)`), click Cancel before it completes, assert the UI shows cancelled, then run a simple query and assert it succeeds.
 
 **Acceptance:** Cancel completes within 2 seconds; recovery query succeeds; no frozen UI.
