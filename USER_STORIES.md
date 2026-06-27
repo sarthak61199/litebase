@@ -190,7 +190,7 @@ Create `src/stores/settingsStore.ts` (Zustand). State: `timeoutMs: number` (defa
 
 ---
 
-## US-30 — Unit test: store transitions
+~~## US-30 — Unit test: store transitions~~
 Write Vitest tests for each Zustand store (`engineStore`, `editorStore`, `resultStore`, `settingsStore`). Cover every setter and all valid phase transitions in `resultStore`.
 
 **Acceptance:** All stores tested in isolation; no cross-store imports in test files.
