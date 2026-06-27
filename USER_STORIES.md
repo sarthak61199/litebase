@@ -309,7 +309,7 @@ Write a Playwright test: run a long-running query (e.g. `pg_sleep(60)`), click C
 
 ---
 
-## US-41 — E2E test: timeout recovery
+~~## US-41 — E2E test: timeout recovery~~
 Write a Playwright test: set the timeout to a low value (e.g. 500 ms), run a `pg_sleep(10)` query, assert the query times out and the UI shows the timed-out state, then run a simple query and assert it succeeds.
 
 **Acceptance:** Timeout triggers within ~1 second; recovery query succeeds.
