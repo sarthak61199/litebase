@@ -281,7 +281,7 @@ Write RTL tests for `ResultsTable.tsx`. Cover: columns from `fields`, rows rende
 
 ---
 
-## US-34 — Component test: Editor keyboard shortcut
+~~## US-34 — Component test: Editor keyboard shortcut~~
 Write RTL tests for `Editor.tsx`. Cover: value change propagates to `useEditorStore`; `Cmd+Enter` and `Ctrl+Enter` call `controller.run()`.
 
 **Acceptance:** Both shortcuts fire `run`; value sync works.

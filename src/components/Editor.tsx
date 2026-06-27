@@ -23,16 +23,6 @@ export function Editor({ controller }: EditorProps) {
   useEffect(() => {
     if (!containerRef.current) return;
 
-    const runKeymap = keymap.of([
-      {
-        key: "Mod-Enter",
-        run: () => {
-          controllerRef.current.run();
-          return true;
-        },
-      },
-    ]);
-
     const syncToStore = EditorView.updateListener.of((update) => {
       if (update.docChanged) {
         setSql(update.state.doc.toString());
@@ -43,8 +33,17 @@ export function Editor({ controller }: EditorProps) {
       doc: "",
       extensions: [
         history(),
-        keymap.of([...defaultKeymap, ...historyKeymap]),
-        runKeymap,
+        keymap.of([
+          {
+            key: "Mod-Enter",
+            run: () => {
+              controllerRef.current.run();
+              return true;
+            },
+          },
+          ...defaultKeymap,
+          ...historyKeymap,
+        ]),
         sql({ dialect: PostgreSQL }),
         syncToStore,
         EditorView.theme({
