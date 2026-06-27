@@ -53,23 +53,9 @@ describe("DBClient", () => {
   const eventTypes = () => events.map((e) => e.type);
 
   describe("boot()", () => {
-    it("applies session statement_timeout via init on boot", async () => {
-      mock.call.mockResolvedValue({ ok: true });
-      await client.boot();
-      expect(mock.call).toHaveBeenCalledWith("init", { timeoutMs: 10_000 });
-    });
-
     it("emits engine:booting then engine:ready", async () => {
-      mock.call.mockResolvedValue({ ok: true });
       await client.boot();
       expect(eventTypes()).toEqual(["engine:booting", "engine:ready"]);
-    });
-
-    it("emits engine:booting and propagates the error when init fails", async () => {
-      mock.call.mockRejectedValue(new Error("init failed"));
-      await expect(client.boot()).rejects.toThrow("init failed");
-      expect(eventTypes()).toContain("engine:booting");
-      expect(eventTypes()).not.toContain("engine:ready");
     });
   });
 
@@ -231,8 +217,7 @@ describe("DBClient", () => {
         .mockImplementationOnce((_m, _p, opts) => hangUntilAbort(opts?.signal))
         .mockRejectedValueOnce(
           new Error("RPC call 'ping' timed out after 500ms"),
-        )
-        .mockResolvedValueOnce({ ok: true });
+        );
     }
 
     it("emits engine:restarting then engine:ready when ping times out after cancel", async () => {
@@ -256,16 +241,6 @@ describe("DBClient", () => {
       expect(mock.restart).toHaveBeenCalledTimes(1);
     });
 
-    it("re-applies statement_timeout to the fresh worker after respawn", async () => {
-      setupHardStop();
-      const ready = waitForReady();
-      const p = client.run("SELECT 1");
-      client.cancel();
-      await expect(p).rejects.toThrow();
-      await ready;
-      expect(mock.call).toHaveBeenCalledWith("init", { timeoutMs: 10_000 });
-    });
-
     it("allows a new run after hard stop completes", async () => {
       setupHardStop();
       const ready = waitForReady();
@@ -275,28 +250,6 @@ describe("DBClient", () => {
       await ready;
       mock.call.mockResolvedValueOnce(EMPTY_RESULT);
       await expect(client.run("SELECT 2")).resolves.toEqual(EMPTY_RESULT);
-    });
-
-    it("emits engine:crashed when re-init fails after respawn", async () => {
-      mock.call
-        .mockImplementationOnce((_m, _p, opts) => hangUntilAbort(opts?.signal))
-        .mockRejectedValueOnce(new Error("ping timed out"))
-        .mockRejectedValueOnce(new Error("PGlite init failed"));
-
-      const crashed = new Promise<void>((resolve) => {
-        const off = client.on((e) => {
-          if (e.type === "engine:crashed") {
-            off();
-            resolve();
-          }
-        });
-      });
-
-      const p = client.run("SELECT 1");
-      client.cancel();
-      await expect(p).rejects.toThrow();
-      await crashed;
-      expect(eventTypes()).toContain("engine:crashed");
     });
 
     it("rejects a new run while a restart is still in progress", async () => {
@@ -325,15 +278,8 @@ describe("DBClient", () => {
   });
 
   describe("setTimeoutMs()", () => {
-    it("calls init with the new timeout", async () => {
-      mock.call.mockResolvedValue({ ok: true });
-      await client.setTimeoutMs(5_000);
-      expect(mock.call).toHaveBeenCalledWith("init", { timeoutMs: 5_000 });
-    });
-
     it("uses the updated timeout for subsequent runs", async () => {
-      mock.call.mockResolvedValue({ ok: true });
-      await client.setTimeoutMs(300);
+      client.setTimeoutMs(300);
 
       mock.call
         .mockImplementationOnce((_m, _p, opts) => hangUntilAbort(opts?.signal))

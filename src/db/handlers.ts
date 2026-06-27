@@ -24,15 +24,6 @@ function liftPgError(err: unknown): never {
 
 export function createHandlers(db: PGlite): Handlers {
   return {
-    async init({ timeoutMs }) {
-      try {
-        await db.exec(`SET statement_timeout = ${Math.floor(timeoutMs)}`);
-      } catch (err) {
-        liftPgError(err);
-      }
-      return { ok: true };
-    },
-
     async query({ sql, rowCapOverride }) {
       const cap = rowCapOverride ?? DEFAULT_ROW_CAP;
       try {

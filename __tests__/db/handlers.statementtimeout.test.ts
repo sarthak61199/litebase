@@ -40,14 +40,13 @@ async function runWithVerdict(
 }
 
 describe("statement_timeout behavior (real PGlite, Node — US-38)", () => {
-  describe("pg_sleep(3) with statement_timeout = 300ms", () => {
+  describe("pg_sleep(3)", () => {
     let db: PGlite;
     let handlers: ReturnType<typeof createHandlers>;
 
     beforeAll(async () => {
       db = new PGlite();
       handlers = createHandlers(db);
-      await handlers.init({ timeoutMs: 300 });
     });
 
     afterAll(async () => {
@@ -63,8 +62,7 @@ describe("statement_timeout behavior (real PGlite, Node — US-38)", () => {
         );
 
         console.log(
-          `[US-38] pg_sleep(3) verdict: ${verdict.toUpperCase()} in ${elapsedMs}ms` +
-            ` (statement_timeout=300ms). statement_timeout ${verdict === "aborted" ? "FIRED" : "did NOT fire"}.`
+          `[US-38] pg_sleep(3) verdict: ${verdict.toUpperCase()} in ${elapsedMs}ms`
         );
 
         // Verdict only — either outcome is accepted.
@@ -74,14 +72,13 @@ describe("statement_timeout behavior (real PGlite, Node — US-38)", () => {
     );
   });
 
-  describe("CPU-bound 25M-row cross-join with statement_timeout = 300ms", () => {
+  describe("CPU-bound 25M-row cross-join", () => {
     let db: PGlite;
     let handlers: ReturnType<typeof createHandlers>;
 
     beforeAll(async () => {
       db = new PGlite();
       handlers = createHandlers(db);
-      await handlers.init({ timeoutMs: 300 });
     });
 
     afterAll(async () => {
@@ -99,8 +96,7 @@ describe("statement_timeout behavior (real PGlite, Node — US-38)", () => {
         );
 
         console.log(
-          `[US-38] CPU cross-join verdict: ${verdict.toUpperCase()} in ${elapsedMs}ms` +
-            ` (statement_timeout=300ms). statement_timeout ${verdict === "aborted" ? "FIRED" : "did NOT fire"}.`
+          `[US-38] CPU cross-join verdict: ${verdict.toUpperCase()} in ${elapsedMs}ms`
         );
 
         // Verdict only — either outcome is accepted.

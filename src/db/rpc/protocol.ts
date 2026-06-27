@@ -1,7 +1,4 @@
 export interface DbRequests {
-  init: {
-    timeoutMs: number;
-  };
   query: {
     sql: string;
     rowCapOverride?: number;
@@ -10,9 +7,6 @@ export interface DbRequests {
 }
 
 export interface DbResponses {
-  init: {
-    ok: true;
-  };
   query: {
     fields: Array<{ name: string; dataTypeID: number }>;
     rows: unknown[][];

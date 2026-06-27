@@ -147,7 +147,7 @@ Write a Vitest integration test (Node, real PGlite) covering both the spike case
 
 ---
 
-## US-46 — Remove layer 2: delete statement_timeout wiring
+~~## US-46 — Remove layer 2: delete statement_timeout wiring~~
 US-38 integration tests confirmed `statement_timeout` is a complete no-op in PGlite — the interrupt is never delivered for any query type (neither CPU-bound nor `pg_sleep`) because WASM blocks the JS event loop synchronously. Remove all dead code before building the frontend.
 
 Changes required:

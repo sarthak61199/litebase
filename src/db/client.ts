@@ -46,19 +46,13 @@ export class DBClient {
     this.listeners.forEach(l => l(event));
   }
 
-  private async applyTimeout(): Promise<void> {
-    await this.rpc.call('init', { timeoutMs: this.timeoutMs });
-  }
-
   async boot(): Promise<void> {
     this.emit({ type: 'engine:booting' });
-    await this.applyTimeout();
     this.emit({ type: 'engine:ready' });
   }
 
-  async setTimeoutMs(ms: number): Promise<void> {
+  setTimeoutMs(ms: number): void {
     this.timeoutMs = ms;
-    await this.applyTimeout();
   }
 
   async run(sql: string, options: { timeoutMs?: number } = {}): Promise<QueryResult> {
@@ -114,28 +108,16 @@ export class DBClient {
     this.currentAc.abort(new Error('Cancelled by user'));
   }
 
-  // Probes the worker after a soft-cancel. If it responds within the grace
-  // period the worker freed itself (statement_timeout fired). If not, we
-  // terminate and respawn — the only guaranteed stop.
   private async maybeHardStop(): Promise<void> {
     this.restarting = true;
     try {
       await this.rpc.call('ping', {}, { timeoutMs: HARD_STOP_GRACE_MS });
-      // Worker responded — it freed itself, no restart needed.
       this.restarting = false;
     } catch {
-      // Worker did not respond in time — terminate and respawn.
       this.emit({ type: 'engine:restarting' });
       this.rpc.restart();
-      try {
-        await this.applyTimeout();
-        this.emit({ type: 'engine:ready' });
-      } catch (bootErr) {
-        const error = bootErr instanceof Error ? bootErr : new Error(String(bootErr));
-        this.emit({ type: 'engine:crashed', error });
-      } finally {
-        this.restarting = false;
-      }
+      this.emit({ type: 'engine:ready' });
+      this.restarting = false;
     }
   }
 }

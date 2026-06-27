@@ -17,11 +17,6 @@ describe("createHandlers — integration (real PGlite memory://)", () => {
     await db.close();
   });
 
-  it("init: applies statement_timeout without error", async () => {
-    const result = await handlers.init({ timeoutMs: 5000 });
-    expect(result).toEqual({ ok: true });
-  });
-
   it("query: CREATE TABLE executes without error", async () => {
     const result = await handlers.query({
       sql: "CREATE TABLE users (id SERIAL PRIMARY KEY, name TEXT NOT NULL)",
