@@ -218,7 +218,7 @@ Create `src/hooks/useRunController.ts`. Read `sql` from `useEditorStore` and `ti
 
 ---
 
-## US-35 — Component test: useRunController orchestration
+~~## US-35 — Component test: useRunController orchestration~~
 Write RTL tests for `useRunController`. Cover: `run()` calls `DBClient.run` with sql + timeout; `cancel()` calls `DBClient.cancel`; hook does not call store setters directly.
 
 **Acceptance:** Orchestration paths covered; `DBClient` is mocked at the interface boundary.
