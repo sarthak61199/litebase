@@ -162,14 +162,14 @@ Changes required:
 
 ---
 
-## US-14 — Implement useEngineStore
+~~## US-14 — Implement useEngineStore~~
 Create `src/stores/engineStore.ts` (Zustand). State: `status: 'booting' | 'ready' | 'restarting' | 'crashed'` and `engineError`. Expose only its own setters; no imports of other stores.
 
 **Acceptance:** Each status transition is reachable via a setter; the store has no dependency on other stores.
 
 ---
 
-## US-15 — Implement useEditorStore
+~~## US-15 — Implement useEditorStore~~
 Create `src/stores/editorStore.ts` (Zustand). State: `sql: string` and `setSql(sql: string)`. No imports of other stores.
 
 **Acceptance:** `setSql` updates `sql`; store has no cross-store imports.

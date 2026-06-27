@@ -1,1 +1,1 @@
-{"root":["./vite.config.ts","./src/App.tsx","./src/main.tsx"],"version":"6.0.3"}
+{"root":["./vite.config.ts","./__tests__/db/client.test.ts","./__tests__/db/handlers.rowcap.test.ts","./__tests__/db/handlers.test.ts","./__tests__/db/rpc/client.test.ts","./__tests__/db/rpc/server.test.ts","./__tests__/db/rpc/shared.test.ts","./src/db/client.ts","./src/db/handlers.ts","./src/db/worker.ts","./src/db/rpc/client.ts","./src/db/rpc/protocol.ts","./src/db/rpc/server.ts","./src/db/rpc/shared.ts","./src/app.tsx","./src/main.tsx"],"version":"6.0.3"}
