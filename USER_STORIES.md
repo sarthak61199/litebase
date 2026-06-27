@@ -183,7 +183,7 @@ Create `src/stores/resultStore.ts` (Zustand). State: `phase: 'idle' | 'running' 
 
 ---
 
-## US-17 — Implement useSettingsStore
+~~## US-17 — Implement useSettingsStore~~
 Create `src/stores/settingsStore.ts` (Zustand). State: `timeoutMs: number` (default 10 000) and `setTimeoutMs`. No imports of other stores.
 
 **Acceptance:** Default is 10 000; `setTimeoutMs` updates the value.
