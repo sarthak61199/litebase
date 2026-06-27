@@ -253,14 +253,14 @@ Create `src/components/Toolbar.tsx`. Show: Run button (disabled while running/re
 
 ---
 
-## US-23 — Build App layout and global styles
+~~## US-23 — Build App layout and design system~~
 Create `src/App.tsx`, `src/main.tsx`, and `src/styles.css`. Layout: editor on top, results below, toolbar across the top. Clean modern appearance.
 
 **Acceptance:** The app renders all three panels without layout overflow; it looks presentable on a 1280×800 viewport.
 
 ---
 
-## US-24 — Add hard-stop warning in the UI
+~~## US-24 — Add hard-stop warning in the UI~~
 When the engine status transitions to `restarting` (hard-stop triggered), display a visible warning that the in-memory database has been reset. The warning must appear before the new worker is ready.
 
 **Acceptance:** Triggering a hard stop shows the reset warning; after the engine reports `ready`, the warning clears.
