@@ -197,7 +197,7 @@ Write Vitest tests for each Zustand store (`engineStore`, `editorStore`, `result
 
 ---
 
-## US-18 — Wire DBClient events to stores in db/bindings.ts
+~~## US-18 — Wire DBClient events to stores in db/bindings.ts~~
 Create `src/db/bindings.ts`: subscribe to `DBClient` events and route each to the correct store setter (`engine:booting` → `useEngineStore`, `run:begin` → `useResultStore.beginRun`, etc.). This must be the only place that couples events to stores.
 
 **Acceptance:** Emitting each `DBClient` event produces the expected store mutation and nothing else.
