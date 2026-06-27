@@ -295,7 +295,7 @@ Install and configure Playwright for end-to-end testing against the Vite dev/pre
 
 ---
 
-## US-39 — E2E test: boot to ready and run a query
+~~## US-39 — E2E test: boot to ready and run a query~~
 Write a Playwright test: load the app, wait for engine status `ready`, type a SELECT, click Run, assert results appear in the table.
 
 **Acceptance:** Test passes against `npm run dev` or `npm run preview` with the real WASM worker.
