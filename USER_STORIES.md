@@ -246,7 +246,7 @@ Create `src/components/ResultsTable.tsx` using `@tanstack/react-virtual`. Render
 
 ---
 
-## US-22 — Build toolbar component
+~~## US-22 — Build toolbar component~~
 Create `src/components/Toolbar.tsx`. Show: Run button (disabled while running/restarting), Cancel button (enabled while running/cancelling), timeout input (number, bound to `useSettingsStore`), engine status badge, execution time, and row count after a result.
 
 **Acceptance:** Run is disabled during a query; Cancel is only enabled when a query is in flight; timing and row count update after each result.
