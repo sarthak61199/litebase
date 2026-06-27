@@ -225,7 +225,7 @@ Write RTL tests for `useRunController`. Cover: `run()` calls `DBClient.run` with
 
 ---
 
-## US-47 — Set up Tailwind CSS 4 with Vite
+~~## US-47 — Set up Tailwind CSS 4 with Vite~~
 Install and configure Tailwind CSS 4 for the Vite + React project. Use the `@tailwindcss/vite` plugin (the Tailwind 4 native Vite integration — no PostCSS config needed). Add `@import "tailwindcss"` to the main CSS entry point and remove any placeholder styles. Confirm that utility classes work in a component.
 
 **Acceptance:** `npm run dev` and `npm run build` succeed; a Tailwind utility class (e.g. `className="text-red-500"`) renders the correct style in the browser; no PostCSS config file is present.
