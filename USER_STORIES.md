@@ -232,7 +232,7 @@ Install and configure Tailwind CSS 4 for the Vite + React project. Use the `@tai
 
 ---
 
-## US-20 — Build CodeMirror SQL editor component
+~~## US-20 — Build CodeMirror SQL editor component~~
 Create `src/components/Editor.tsx`: CodeMirror 6 with `@codemirror/lang-sql` PostgreSQL dialect. Bind value to `useEditorStore`. `Cmd+Enter` / `Ctrl+Enter` calls `controller.run()`.
 
 **Acceptance:** Typing SQL updates the store; pressing the keyboard shortcut fires a run; the PostgreSQL dialect keywords are highlighted.
