@@ -211,7 +211,7 @@ Write Vitest tests for `db/bindings.ts`. For each `DBClient` event, assert the c
 
 ---
 
-## US-19 — Implement useRunController hook
+~~## US-19 — Implement useRunController hook~~
 Create `src/hooks/useRunController.ts`. Read `sql` from `useEditorStore` and `timeoutMs` from `useSettingsStore`. Expose `run()` and `cancel()`. `run()` calls `DBClient.run(sql, { timeoutMs })`; `cancel()` calls `DBClient.cancel()`. This is the only hook that reads multiple stores and drives the client.
 
 **Acceptance:** `run()` triggers a query with the current sql and timeout; `cancel()` calls the client cancel without touching stores directly.
