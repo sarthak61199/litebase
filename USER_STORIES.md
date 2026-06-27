@@ -274,7 +274,7 @@ Write RTL tests for `Toolbar.tsx`. Cover: Run disabled when `phase !== 'idle'`; 
 
 ---
 
-## US-33 — Component test: ResultsTable states
+~~## US-33 — Component test: ResultsTable states~~
 Write RTL tests for `ResultsTable.tsx`. Cover: columns from `fields`, rows rendered, empty state, affected-rows (INSERT/UPDATE), error state, and row-cap banner when `capped: true`.
 
 **Acceptance:** Each state renders the correct text/structure; no virtual-scroll library needs to be mocked.
