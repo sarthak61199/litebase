@@ -48,16 +48,16 @@ describe('WorkerRpc', () => {
 
     it('routes out-of-order responses to the correct promise', async () => {
       const p1 = rpc.call('ping', {});
-      const p2 = rpc.call('init', { timeoutMs: 5000 });
+      const p2 = rpc.call('query', { sql: 'SELECT 2' });
       const req1 = fakeWorker.messages[0] as { id: string };
       const req2 = fakeWorker.messages[1] as { id: string };
 
       // respond to p2 first, then p1
-      fakeWorker.respond({ id: req2.id, method: 'init', ok: true, result: { ok: true } });
+      fakeWorker.respond({ id: req2.id, method: 'query', ok: true, result: { fields: [], rows: [], totalRows: 0, capped: false } });
       fakeWorker.respond({ id: req1.id, method: 'ping', ok: true, result: { ok: true } });
 
       await expect(p1).resolves.toEqual({ ok: true });
-      await expect(p2).resolves.toEqual({ ok: true });
+      await expect(p2).resolves.toEqual({ fields: [], rows: [], totalRows: 0, capped: false });
     });
 
     it('rejects with a deserialized error on an error response', async () => {
@@ -157,7 +157,7 @@ describe('WorkerRpc', () => {
 
     it('rejects all pending calls', async () => {
       const p1 = rpc.call('ping', {});
-      const p2 = rpc.call('init', { timeoutMs: 5000 });
+      const p2 = rpc.call('query', { sql: 'SELECT 1' });
       rpc.terminate();
       await expect(p1).rejects.toThrow('Worker terminated');
       await expect(p2).rejects.toThrow('Worker terminated');

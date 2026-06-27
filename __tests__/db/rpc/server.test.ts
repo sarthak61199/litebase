@@ -4,7 +4,6 @@ import type { Handlers } from '../../../src/db/rpc/server';
 
 function makeHandlers(overrides: Partial<Handlers> = {}): Handlers {
   return {
-    init: vi.fn().mockResolvedValue({ ok: true }),
     query: vi.fn().mockResolvedValue({ fields: [], rows: [], totalRows: 0, capped: false }),
     ping: vi.fn().mockResolvedValue({ ok: true }),
     ...overrides,
@@ -75,19 +74,19 @@ describe('serveWorker', () => {
 
   it('serializes and posts a handler rejection', async () => {
     const handlers = makeHandlers({
-      init: vi.fn().mockRejectedValue(new Error('init blew up')),
+      query: vi.fn().mockRejectedValue(new Error('query blew up')),
     });
     serveWorker(handlers);
 
-    fire({ id: 'r4', method: 'init', payload: { timeoutMs: 5000 } });
+    fire({ id: 'r4', method: 'query', payload: { sql: 'bad' } });
     await flush();
 
     expect(postSpy).toHaveBeenCalledOnce();
     const [msg] = postSpy.mock.calls[0];
     expect(msg.id).toBe('r4');
-    expect(msg.method).toBe('init');
+    expect(msg.method).toBe('query');
     expect(msg.ok).toBe(false);
-    expect(msg.error.message).toBe('init blew up');
+    expect(msg.error.message).toBe('query blew up');
     expect(msg.error.name).toBe('Error');
   });
 
