@@ -4,20 +4,25 @@ import { ResultsTable } from '../../src/components/ResultsTable';
 import { useResultStore } from '../../src/stores/resultStore';
 import type { QueryResult } from '../../src/stores/resultStore';
 
-// jsdom has no layout engine — stub the virtualizer to render all items inline
+// jsdom has no layout engine — stub the virtualizer to render items inline.
+// Cap at 20 so large-dataset tests (e.g. 10 000-row cap banner) don't time out;
+// banner text comes from rows.length, not from rendered virtual items.
 vi.mock('@tanstack/react-virtual', () => ({
-  useVirtualizer: ({ count, estimateSize }: { count: number; estimateSize: () => number }) => ({
-    getVirtualItems: () =>
-      Array.from({ length: count }, (_, i) => ({
-        index: i,
-        start: i * estimateSize(),
-        key: i,
-        size: estimateSize(),
-        lane: 0,
-        end: (i + 1) * estimateSize(),
-      })),
-    getTotalSize: () => count * estimateSize(),
-  }),
+  useVirtualizer: ({ count, estimateSize }: { count: number; estimateSize: () => number }) => {
+    const renderCount = Math.min(count, 20);
+    return {
+      getVirtualItems: () =>
+        Array.from({ length: renderCount }, (_, i) => ({
+          index: i,
+          start: i * estimateSize(),
+          key: i,
+          size: estimateSize(),
+          lane: 0,
+          end: (i + 1) * estimateSize(),
+        })),
+      getTotalSize: () => count * estimateSize(),
+    };
+  },
 }));
 
 function makeResult(overrides: Partial<QueryResult> = {}): QueryResult {
