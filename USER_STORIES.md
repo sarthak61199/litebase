@@ -267,7 +267,7 @@ When the engine status transitions to `restarting` (hard-stop triggered), displa
 
 ---
 
-## US-32 — Component test: Toolbar rendering and interaction
+~~## US-32 — Component test: Toolbar rendering and interaction~~
 Write RTL tests for `Toolbar.tsx`. Cover: Run disabled when `phase !== 'idle'`; Cancel enabled when `phase === 'running'`; timeout input updates `useSettingsStore`; timing and row count render after a result.
 
 **Acceptance:** All cases pass with a real store (no mocked Zustand).
