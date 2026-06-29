@@ -26,7 +26,7 @@ A 100% client-side PostgreSQL playground. Real Postgres 17 runs in your browser 
 | Build tool | [Vite](https://vitejs.dev/) |
 | Unit/integration tests | [Vitest](https://vitest.dev/) |
 | E2E tests | [Playwright](https://playwright.dev/) |
-| Type checking | TypeScript 5 |
+| Type checking | TypeScript 6 |
 
 ## Getting Started
 
