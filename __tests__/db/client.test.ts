@@ -13,7 +13,7 @@ const EMPTY_RESULT: QueryResult = {
 type CallFn = (
   method: string,
   payload: unknown,
-  opts?: { signal?: AbortSignal; timeoutMs?: number },
+  opts?: { signal?: AbortSignal; timeoutMs?: number }
 ) => Promise<unknown>;
 
 function makeMockRpc() {
@@ -29,7 +29,7 @@ function hangUntilAbort(signal?: AbortSignal): Promise<never> {
     signal?.addEventListener(
       "abort",
       () => reject(signal.reason ?? new Error("Aborted")),
-      { once: true },
+      { once: true }
     );
   });
 }
@@ -80,7 +80,7 @@ describe("DBClient", () => {
       expect(mock.call).toHaveBeenCalledWith(
         "query",
         { sql: "SELECT 42" },
-        expect.objectContaining({ signal: expect.any(Object) }),
+        expect.objectContaining({ signal: expect.any(Object) })
       );
     });
 
@@ -103,7 +103,7 @@ describe("DBClient", () => {
       expect(mock.call).not.toHaveBeenCalledWith(
         "ping",
         expect.anything(),
-        expect.anything(),
+        expect.anything()
       );
     });
 
@@ -123,7 +123,7 @@ describe("DBClient", () => {
 
       const first = client.run("SELECT 1");
       await expect(client.run("SELECT 2")).rejects.toBeInstanceOf(
-        AlreadyRunningError,
+        AlreadyRunningError
       );
 
       client.cancel();
@@ -217,7 +217,7 @@ describe("DBClient", () => {
       mock.call
         .mockImplementationOnce((_m, _p, opts) => hangUntilAbort(opts?.signal))
         .mockRejectedValueOnce(
-          new Error("RPC call 'ping' timed out after 500ms"),
+          new Error("RPC call 'ping' timed out after 500ms")
         );
     }
 
@@ -269,7 +269,7 @@ describe("DBClient", () => {
       await expect(p).rejects.toThrow();
 
       await expect(client.run("SELECT 2")).rejects.toThrow(
-        "Engine is restarting",
+        "Engine is restarting"
       );
 
       const ready = waitForReady();

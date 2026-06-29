@@ -1,20 +1,20 @@
-import type { RunController } from '../hooks/useRunController';
-import { useEngineStore } from '../stores/engineStore';
-import { useResultStore } from '../stores/resultStore';
-import { useSettingsStore } from '../stores/settingsStore';
+import type { RunController } from "../hooks/useRunController";
+import { useEngineStore } from "../stores/engineStore";
+import { useResultStore } from "../stores/resultStore";
+import { useSettingsStore } from "../stores/settingsStore";
 
 const STATUS_LABEL: Record<string, string> = {
-  booting: 'Booting',
-  ready: 'Ready',
-  restarting: 'Restarting',
-  crashed: 'Crashed',
+  booting: "Booting",
+  ready: "Ready",
+  restarting: "Restarting",
+  crashed: "Crashed",
 };
 
 const STATUS_DOT: Record<string, string> = {
-  booting: 'bg-yellow-400 animate-pulse',
-  ready: 'bg-green-400',
-  restarting: 'bg-orange-400 animate-pulse',
-  crashed: 'bg-red-500',
+  booting: "bg-yellow-400 animate-pulse",
+  ready: "bg-green-400",
+  restarting: "bg-orange-400 animate-pulse",
+  crashed: "bg-red-500",
 };
 
 export function Toolbar({ controller }: { controller: RunController }) {
@@ -25,8 +25,12 @@ export function Toolbar({ controller }: { controller: RunController }) {
   const timeoutMs = useSettingsStore((s) => s.timeoutMs);
   const setTimeoutMs = useSettingsStore((s) => s.setTimeoutMs);
 
-  const isRunDisabled = phase !== 'idle' || engineStatus === 'restarting' || engineStatus === 'booting' || engineStatus === 'crashed';
-  const isCancelEnabled = phase === 'running' || phase === 'cancelling';
+  const isRunDisabled =
+    phase !== "idle" ||
+    engineStatus === "restarting" ||
+    engineStatus === "booting" ||
+    engineStatus === "crashed";
+  const isCancelEnabled = phase === "running" || phase === "cancelling";
 
   const rowCount = result?.rows?.length ?? null;
   const totalRows = result?.totalRows ?? null;
@@ -92,14 +96,18 @@ export function Toolbar({ controller }: { controller: RunController }) {
           {rowCount.toLocaleString()}
           {totalRows != null && totalRows > rowCount
             ? ` / ${totalRows.toLocaleString()} rows`
-            : ` row${rowCount !== 1 ? 's' : ''}`}
+            : ` row${rowCount !== 1 ? "s" : ""}`}
         </span>
       )}
 
       {/* Engine status badge */}
       <div className="flex items-center gap-1.5 pl-3 border-l border-gray-800">
-        <span className={`w-2 h-2 rounded-full shrink-0 ${STATUS_DOT[engineStatus] ?? 'bg-gray-500'}`} />
-        <span className="text-xs text-gray-400">{STATUS_LABEL[engineStatus] ?? engineStatus}</span>
+        <span
+          className={`w-2 h-2 rounded-full shrink-0 ${STATUS_DOT[engineStatus] ?? "bg-gray-500"}`}
+        />
+        <span className="text-xs text-gray-400">
+          {STATUS_LABEL[engineStatus] ?? engineStatus}
+        </span>
       </div>
     </div>
   );

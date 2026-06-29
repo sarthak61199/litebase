@@ -89,7 +89,7 @@ export function Editor({ controller }: EditorProps) {
               borderLeftWidth: "2px",
             },
           },
-          { dark: true },
+          { dark: true }
         ),
       ],
     });

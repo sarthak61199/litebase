@@ -1,6 +1,6 @@
-import type { DbRequests, DbResponses } from './protocol';
-import type { Method, RpcMessage, RpcRequest } from './shared';
-import { deserializeError } from './shared';
+import type { DbRequests, DbResponses } from "./protocol";
+import type { Method, RpcMessage, RpcRequest } from "./shared";
+import { deserializeError } from "./shared";
 
 interface PendingCall {
   resolve: (value: unknown) => void;
@@ -46,10 +46,12 @@ export class WorkerRpc {
     });
     const gen = this.generation;
     const worker = this.spawn();
-    worker.onmessage = (event: MessageEvent<RpcMessage | { type: 'ready' }>) => {
+    worker.onmessage = (
+      event: MessageEvent<RpcMessage | { type: "ready" }>
+    ) => {
       if (gen !== this.generation) return;
       const data = event.data;
-      if (data && (data as { type?: string }).type === 'ready') {
+      if (data && (data as { type?: string }).type === "ready") {
         this.resolveReady();
         return;
       }
@@ -58,7 +60,7 @@ export class WorkerRpc {
     // Reject all pending calls if the worker crashes so they don't hang forever.
     worker.onerror = () => {
       if (gen !== this.generation) return;
-      this.rejectAll(new Error('Worker crashed'));
+      this.rejectAll(new Error("Worker crashed"));
     };
     return worker;
   }
@@ -86,18 +88,18 @@ export class WorkerRpc {
   call<M extends Method>(
     method: M,
     payload: DbRequests[M],
-    options: { timeoutMs?: number; signal?: AbortSignal } = {},
+    options: { timeoutMs?: number; signal?: AbortSignal } = {}
   ): Promise<DbResponses[M]> {
     return new Promise((resolve, reject) => {
       const id = `${this.generation}-${this.nextId++}`;
 
       if (options.signal?.aborted) {
-        reject(options.signal.reason ?? new Error('Aborted'));
+        reject(options.signal.reason ?? new Error("Aborted"));
         return;
       }
 
       const cleanupFns: Array<() => void> = [];
-      const cleanup = () => cleanupFns.forEach(fn => fn());
+      const cleanup = () => cleanupFns.forEach((fn) => fn());
 
       if (options.signal) {
         const sig = options.signal;
@@ -105,10 +107,10 @@ export class WorkerRpc {
           if (!this.pending.has(id)) return;
           this.pending.delete(id);
           cleanup();
-          reject(sig.reason ?? new Error('Aborted'));
+          reject(sig.reason ?? new Error("Aborted"));
         };
-        sig.addEventListener('abort', onAbort, { once: true });
-        cleanupFns.push(() => sig.removeEventListener('abort', onAbort));
+        sig.addEventListener("abort", onAbort, { once: true });
+        cleanupFns.push(() => sig.removeEventListener("abort", onAbort));
       }
 
       if (options.timeoutMs !== undefined && options.timeoutMs > 0) {
@@ -136,13 +138,13 @@ export class WorkerRpc {
   terminate(): void {
     this.generation++;
     this.worker.terminate();
-    this.rejectAll(new Error('Worker terminated'));
+    this.rejectAll(new Error("Worker terminated"));
   }
 
   restart(): void {
     this.generation++;
     this.worker.terminate();
-    this.rejectAll(new Error('Worker restarted'));
+    this.rejectAll(new Error("Worker restarted"));
     this.worker = this.spawnWorker();
   }
 }

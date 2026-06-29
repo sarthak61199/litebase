@@ -38,9 +38,8 @@ test("US-43: large SELECT enforces row cap and banner renders", async ({
   // performance.memory is Chromium-only; skip gracefully on other engines.
   const heapBytes = await page.evaluate(
     () =>
-      (
-        performance as { memory?: { usedJSHeapSize: number } }
-      ).memory?.usedJSHeapSize ?? null
+      (performance as { memory?: { usedJSHeapSize: number } }).memory
+        ?.usedJSHeapSize ?? null
   );
   if (heapBytes !== null) {
     // 500 MB is a generous ceiling — the actual heap for 10 k integer rows is

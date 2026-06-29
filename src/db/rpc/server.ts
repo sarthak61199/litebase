@@ -1,6 +1,6 @@
-import type { DbRequests, DbResponses } from './protocol';
-import type { Method, RpcRequest } from './shared';
-import { serializeError } from './shared';
+import type { DbRequests, DbResponses } from "./protocol";
+import type { Method, RpcRequest } from "./shared";
+import { serializeError } from "./shared";
 
 export type Handlers = {
   [M in Method]: (payload: DbRequests[M]) => Promise<DbResponses[M]>;
@@ -12,7 +12,7 @@ export function serveWorker(handlers: Handlers): void {
 
     const handler = (handlers as Record<string, unknown>)[method];
 
-    if (typeof handler !== 'function') {
+    if (typeof handler !== "function") {
       self.postMessage({
         id,
         method,
@@ -23,7 +23,9 @@ export function serveWorker(handlers: Handlers): void {
     }
 
     try {
-      const result = await (handler as (p: unknown) => Promise<unknown>)(payload);
+      const result = await (handler as (p: unknown) => Promise<unknown>)(
+        payload
+      );
       self.postMessage({ id, method, ok: true, result });
     } catch (err) {
       self.postMessage({ id, method, ok: false, error: serializeError(err) });

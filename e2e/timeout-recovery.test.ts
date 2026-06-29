@@ -18,9 +18,9 @@ test("US-41: query timeout triggers and app recovers", async ({ page }) => {
   await expect(page.getByText("Running…")).toBeVisible({ timeout: 5_000 });
 
   // Acceptance: timeout triggers within ~1 second
-  await expect(
-    page.getByText(/timed out after 500ms/)
-  ).toBeVisible({ timeout: 3_000 });
+  await expect(page.getByText(/timed out after 500ms/)).toBeVisible({
+    timeout: 3_000,
+  });
 
   // Hard-stop follows automatically: 500ms ping grace + worker terminate + respawn.
   // Wait for the full sequence before attempting the recovery query.
@@ -38,6 +38,10 @@ test("US-41: query timeout triggers and app recovers", async ({ page }) => {
 
   await page.getByRole("button", { name: "Run" }).click();
 
-  await expect(page.getByText("answer", { exact: true })).toBeVisible({ timeout: 10_000 });
-  await expect(page.locator("span.text-gray-300").getByText("42", { exact: true })).toBeVisible();
+  await expect(page.getByText("answer", { exact: true })).toBeVisible({
+    timeout: 10_000,
+  });
+  await expect(
+    page.locator("span.text-gray-300").getByText("42", { exact: true })
+  ).toBeVisible();
 });

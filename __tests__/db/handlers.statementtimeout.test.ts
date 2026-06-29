@@ -53,23 +53,19 @@ describe("statement_timeout behavior (real PGlite, Node — US-38)", () => {
       await db.close();
     });
 
-    it(
-      "records whether statement_timeout fires for a pg_sleep query",
-      async () => {
-        const { verdict, elapsedMs } = await runWithVerdict(
-          handlers,
-          "SELECT pg_sleep(3)"
-        );
+    it("records whether statement_timeout fires for a pg_sleep query", async () => {
+      const { verdict, elapsedMs } = await runWithVerdict(
+        handlers,
+        "SELECT pg_sleep(3)"
+      );
 
-        console.log(
-          `[US-38] pg_sleep(3) verdict: ${verdict.toUpperCase()} in ${elapsedMs}ms`
-        );
+      console.log(
+        `[US-38] pg_sleep(3) verdict: ${verdict.toUpperCase()} in ${elapsedMs}ms`
+      );
 
-        // Verdict only — either outcome is accepted.
-        expect(verdict === "aborted" || verdict === "completed").toBe(true);
-      },
-      10_000
-    );
+      // Verdict only — either outcome is accepted.
+      expect(verdict === "aborted" || verdict === "completed").toBe(true);
+    }, 10_000);
   });
 
   describe("CPU-bound 25M-row cross-join", () => {
@@ -85,24 +81,20 @@ describe("statement_timeout behavior (real PGlite, Node — US-38)", () => {
       await db.close();
     });
 
-    it(
-      "records whether statement_timeout fires on a CPU-bound cross-join",
-      async () => {
-        // 5000 × 5000 = 25M combinations; count(*) forces full enumeration
-        // without transferring rows.
-        const { verdict, elapsedMs } = await runWithVerdict(
-          handlers,
-          "SELECT count(*) FROM generate_series(1,5000) a(i), generate_series(1,5000) b(i)"
-        );
+    it("records whether statement_timeout fires on a CPU-bound cross-join", async () => {
+      // 5000 × 5000 = 25M combinations; count(*) forces full enumeration
+      // without transferring rows.
+      const { verdict, elapsedMs } = await runWithVerdict(
+        handlers,
+        "SELECT count(*) FROM generate_series(1,5000) a(i), generate_series(1,5000) b(i)"
+      );
 
-        console.log(
-          `[US-38] CPU cross-join verdict: ${verdict.toUpperCase()} in ${elapsedMs}ms`
-        );
+      console.log(
+        `[US-38] CPU cross-join verdict: ${verdict.toUpperCase()} in ${elapsedMs}ms`
+      );
 
-        // Verdict only — either outcome is accepted.
-        expect(verdict === "aborted" || verdict === "completed").toBe(true);
-      },
-      60_000
-    );
+      // Verdict only — either outcome is accepted.
+      expect(verdict === "aborted" || verdict === "completed").toBe(true);
+    }, 60_000);
   });
 });

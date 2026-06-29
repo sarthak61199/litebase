@@ -1,6 +1,6 @@
-import { create } from 'zustand';
+import { create } from "zustand";
 
-type EngineStatus = 'booting' | 'ready' | 'restarting' | 'crashed';
+type EngineStatus = "booting" | "ready" | "restarting" | "crashed";
 
 interface EngineState {
   status: EngineStatus;
@@ -14,12 +14,13 @@ interface EngineState {
 }
 
 export const useEngineStore = create<EngineState>()((set) => ({
-  status: 'booting',
+  status: "booting",
   engineError: null,
   hadRestart: false,
-  setBooting: () => set({ status: 'booting', engineError: null }),
-  setReady: () => set({ status: 'ready', engineError: null }),
-  setRestarting: () => set({ status: 'restarting', engineError: null, hadRestart: true }),
-  setCrashed: (error) => set({ status: 'crashed', engineError: error }),
+  setBooting: () => set({ status: "booting", engineError: null }),
+  setReady: () => set({ status: "ready", engineError: null }),
+  setRestarting: () =>
+    set({ status: "restarting", engineError: null, hadRestart: true }),
+  setCrashed: (error) => set({ status: "crashed", engineError: error }),
   clearHadRestart: () => set({ hadRestart: false }),
 }));

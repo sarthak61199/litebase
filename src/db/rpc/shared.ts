@@ -1,4 +1,4 @@
-import type { DbRequests, DbResponses } from './protocol';
+import type { DbRequests, DbResponses } from "./protocol";
 
 // ── Envelope types ──────────────────────────────────────────────────────────
 
@@ -45,9 +45,12 @@ export class PgError extends Error {
   hint?: string;
   position?: string;
 
-  constructor(message: string, fields: Omit<SerializedError, 'message' | 'name' | 'stack'> = {}) {
+  constructor(
+    message: string,
+    fields: Omit<SerializedError, "message" | "name" | "stack"> = {}
+  ) {
     super(message);
-    this.name = 'PgError';
+    this.name = "PgError";
     this.code = fields.code;
     this.detail = fields.detail;
     this.hint = fields.hint;
@@ -76,7 +79,7 @@ export function serializeError(err: unknown): SerializedError {
   }
   return {
     message: String(err),
-    name: 'Error',
+    name: "Error",
   };
 }
 
@@ -87,7 +90,7 @@ export function deserializeError(serialized: SerializedError): Error {
     serialized.hint !== undefined ||
     serialized.position !== undefined;
 
-  if (hasPgFields || serialized.name === 'PgError') {
+  if (hasPgFields || serialized.name === "PgError") {
     const err = new PgError(serialized.message, {
       code: serialized.code,
       detail: serialized.detail,

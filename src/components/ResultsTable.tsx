@@ -1,12 +1,12 @@
-import { useRef, memo } from 'react';
-import { useVirtualizer } from '@tanstack/react-virtual';
-import { useResultStore } from '../stores/resultStore';
-import type { QueryResult } from '../stores/resultStore';
+import { useRef, memo } from "react";
+import { useVirtualizer } from "@tanstack/react-virtual";
+import { useResultStore } from "../stores/resultStore";
+import type { QueryResult } from "../stores/resultStore";
 
 const ROW_HEIGHT = 36;
 const COL_MIN_WIDTH = 120;
 
-type Fields = QueryResult['fields'];
+type Fields = QueryResult["fields"];
 
 const TableRow = memo(function TableRow({
   row,
@@ -20,7 +20,7 @@ const TableRow = memo(function TableRow({
   return (
     <div
       className="absolute top-0 left-0 flex border-b border-gray-800 hover:bg-gray-800/40"
-      style={{ transform, height: ROW_HEIGHT, minWidth: '100%' }}
+      style={{ transform, height: ROW_HEIGHT, minWidth: "100%" }}
     >
       {fields.map((field, i) => (
         <div
@@ -56,7 +56,7 @@ export function ResultsTable() {
     overscan: 10,
   });
 
-  if (phase === 'running') {
+  if (phase === "running") {
     return (
       <div className="flex items-center justify-center h-full text-gray-400 text-sm">
         Running…
@@ -64,7 +64,7 @@ export function ResultsTable() {
     );
   }
 
-  if (phase === 'cancelling') {
+  if (phase === "cancelling") {
     return (
       <div className="flex items-center justify-center h-full text-gray-400 text-sm">
         Cancelling…
@@ -95,8 +95,8 @@ export function ResultsTable() {
     return (
       <div className="flex items-center justify-center h-full text-gray-400 text-sm">
         {affected != null && affected > 0
-          ? `${affected} row${affected !== 1 ? 's' : ''} affected`
-          : 'Query OK'}
+          ? `${affected} row${affected !== 1 ? "s" : ""} affected`
+          : "Query OK"}
       </div>
     );
   }
@@ -117,7 +117,8 @@ export function ResultsTable() {
     <div className="flex flex-col h-full overflow-hidden">
       {result.capped && (
         <div className="px-3 py-1.5 bg-amber-900/30 border-b border-amber-700/40 text-amber-400 text-xs shrink-0">
-          Showing first {rows.length.toLocaleString()} of {result.totalRows.toLocaleString()} rows — row cap applied
+          Showing first {rows.length.toLocaleString()} of{" "}
+          {result.totalRows.toLocaleString()} rows — row cap applied
         </div>
       )}
       <ColumnHeaders fields={fields} />

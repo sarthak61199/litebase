@@ -34,6 +34,10 @@ test("US-40: cancel a runaway query and recover", async ({ page }) => {
   await page.getByRole("button", { name: "Run" }).click();
 
   // Recovery query must succeed and show results
-  await expect(page.getByText("answer", { exact: true })).toBeVisible({ timeout: 10_000 });
-  await expect(page.locator("span.text-gray-300").getByText("42", { exact: true })).toBeVisible();
+  await expect(page.getByText("answer", { exact: true })).toBeVisible({
+    timeout: 10_000,
+  });
+  await expect(
+    page.locator("span.text-gray-300").getByText("42", { exact: true })
+  ).toBeVisible();
 });

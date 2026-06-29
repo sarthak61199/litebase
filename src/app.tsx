@@ -1,18 +1,19 @@
-import { lazy, Suspense, useEffect } from 'react';
-import { DBClient } from './db/client';
-import { WorkerRpc } from './db/rpc/client';
-import { bindClientToStores } from './db/bindings';
-import { useRunController } from './hooks/useRunController';
-import { useEngineStore } from './stores/engineStore';
-import { ResultsTable } from './components/ResultsTable';
-import { Toolbar } from './components/Toolbar';
+import { lazy, Suspense, useEffect } from "react";
+import { DBClient } from "./db/client";
+import { WorkerRpc } from "./db/rpc/client";
+import { bindClientToStores } from "./db/bindings";
+import { useRunController } from "./hooks/useRunController";
+import { useEngineStore } from "./stores/engineStore";
+import { ResultsTable } from "./components/ResultsTable";
+import { Toolbar } from "./components/Toolbar";
 
 const Editor = lazy(() =>
-  import('./components/Editor').then((m) => ({ default: m.Editor })),
+  import("./components/Editor").then((m) => ({ default: m.Editor }))
 );
 
 const rpc = new WorkerRpc(
-  () => new Worker(new URL('./db/worker.ts', import.meta.url), { type: 'module' }),
+  () =>
+    new Worker(new URL("./db/worker.ts", import.meta.url), { type: "module" })
 );
 const client = new DBClient(rpc);
 bindClientToStores(client);
@@ -30,15 +31,22 @@ export function App() {
     <div className="h-screen flex flex-col overflow-hidden bg-gray-950 text-gray-100 antialiased">
       <Toolbar controller={controller} />
 
-      {(engineStatus === 'restarting' || hadRestart) && (
+      {(engineStatus === "restarting" || hadRestart) && (
         <div
           role="alert"
           className="shrink-0 flex items-center gap-2 px-4 py-2 bg-amber-950/50 border-b border-amber-800/40 text-amber-300 text-xs"
         >
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor" className="shrink-0 opacity-80">
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 14 14"
+            fill="currentColor"
+            className="shrink-0 opacity-80"
+          >
             <path d="M7 1L13.06 11.5H.94L7 1zm0 2.18L2.64 10.5h8.72L7 3.18zM6.5 6h1v2.5h-1V6zm0 3h1v1h-1V9z" />
           </svg>
-          Force-stop triggered — the in-memory database has been wiped. All tables have been cleared.
+          Force-stop triggered — the in-memory database has been wiped. All
+          tables have been cleared.
         </div>
       )}
 

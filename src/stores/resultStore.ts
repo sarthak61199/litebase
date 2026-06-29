@@ -1,9 +1,9 @@
-import { create } from 'zustand';
-import type { DbResponses } from '../db/rpc/protocol';
+import { create } from "zustand";
+import type { DbResponses } from "../db/rpc/protocol";
 
-type Phase = 'idle' | 'running' | 'cancelling';
+type Phase = "idle" | "running" | "cancelling";
 
-export type QueryResult = DbResponses['query'];
+export type QueryResult = DbResponses["query"];
 
 interface ResultState {
   phase: Phase;
@@ -19,32 +19,44 @@ interface ResultState {
 }
 
 export const useResultStore = create<ResultState>()((set, get) => ({
-  phase: 'idle',
+  phase: "idle",
   runId: null,
   result: null,
   error: null,
   durationMs: null,
 
   beginRun: (runId) => {
-    set({ phase: 'running', runId, result: null, error: null, durationMs: null });
+    set({
+      phase: "running",
+      runId,
+      result: null,
+      error: null,
+      durationMs: null,
+    });
   },
 
   succeed: (result, durationMs) => {
-    if (get().phase !== 'running' && get().phase !== 'cancelling') return;
-    set({ phase: 'idle', result, error: null, durationMs });
+    if (get().phase !== "running" && get().phase !== "cancelling") return;
+    set({ phase: "idle", result, error: null, durationMs });
   },
 
   fail: (error, durationMs) => {
-    if (get().phase !== 'running' && get().phase !== 'cancelling') return;
-    set({ phase: 'idle', error, result: null, durationMs });
+    if (get().phase !== "running" && get().phase !== "cancelling") return;
+    set({ phase: "idle", error, result: null, durationMs });
   },
 
   cancelling: () => {
-    if (get().phase !== 'running') return;
-    set({ phase: 'cancelling' });
+    if (get().phase !== "running") return;
+    set({ phase: "cancelling" });
   },
 
   reset: () => {
-    set({ phase: 'idle', runId: null, result: null, error: null, durationMs: null });
+    set({
+      phase: "idle",
+      runId: null,
+      result: null,
+      error: null,
+      durationMs: null,
+    });
   },
 }));

@@ -1,4 +1,4 @@
-import { create } from 'zustand';
+import { create } from "zustand";
 
 interface EditorState {
   sql: string;
@@ -6,6 +6,6 @@ interface EditorState {
 }
 
 export const useEditorStore = create<EditorState>()((set) => ({
-  sql: '',
+  sql: "",
   setSql: (sql) => set({ sql }),
 }));

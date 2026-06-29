@@ -151,6 +151,7 @@ Write a Vitest integration test (Node, real PGlite) covering both the spike case
 US-38 integration tests confirmed `statement_timeout` is a complete no-op in PGlite — the interrupt is never delivered for any query type (neither CPU-bound nor `pg_sleep`) because WASM blocks the JS event loop synchronously. Remove all dead code before building the frontend.
 
 Changes required:
+
 - `src/db/handlers.ts` — delete the `init` handler entirely; remove it from the `Handlers` return type.
 - `src/db/rpc/protocol.ts` — remove the `init` entry from `DbRequests` and `DbResponses`.
 - `src/db/client.ts` — remove the `rpc.call('init', ...)` call and any `timeoutMs`-to-worker wiring; `DBClient` still accepts `timeoutMs` on `run()` for the main-thread soft-cancel timer, but never sends it to the worker.
@@ -331,6 +332,7 @@ Write a Playwright test: run a query that would return more than 10 000 rows (e.
 ---
 
 ## US-44 — Deploy: build and upload to S3 with correct content types
+
 Write a deploy script (or document the `aws s3 sync` command) that uploads `dist/` to S3 with: `.wasm` → `application/wasm`, `.data` and hashed assets → `Cache-Control: public, max-age=31536000, immutable`, `index.html` → `Cache-Control: no-cache`.
 
 **Acceptance:** Running the script produces no MIME or cache-control errors; `instantiateStreaming` works in the deployed app.
@@ -338,6 +340,7 @@ Write a deploy script (or document the `aws s3 sync` command) that uploads `dist
 ---
 
 ## US-45 — Deploy: CloudFront invalidation of index.html
+
 Add a step to the deploy script (or CI workflow) that invalidates `/index.html` on the CloudFront distribution after each `s3 sync`.
 
 **Acceptance:** After deploy, a hard refresh fetches the new `index.html` without a CDN-cached stale version.
