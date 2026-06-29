@@ -19,6 +19,7 @@ export function bindClientToStores(client: DBClient): () => void {
         break;
       case 'run:begin':
         useResultStore.getState().beginRun(event.runId);
+        useEngineStore.getState().clearHadRestart();
         break;
       case 'run:succeed':
         useResultStore.getState().succeed(event.result, event.durationMs);

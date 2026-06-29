@@ -16,6 +16,7 @@ bindClientToStores(client);
 
 export function App() {
   const engineStatus = useEngineStore((s) => s.status);
+  const hadRestart = useEngineStore((s) => s.hadRestart);
   const controller = useRunController(client);
 
   useEffect(() => {
@@ -26,7 +27,7 @@ export function App() {
     <div className="h-screen flex flex-col overflow-hidden bg-gray-950 text-gray-100 antialiased">
       <Toolbar controller={controller} />
 
-      {engineStatus === 'restarting' && (
+      {(engineStatus === 'restarting' || hadRestart) && (
         <div
           role="alert"
           className="shrink-0 flex items-center gap-2 px-4 py-2 bg-amber-950/50 border-b border-amber-800/40 text-amber-300 text-xs"
