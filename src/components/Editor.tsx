@@ -3,12 +3,27 @@ import { EditorView, keymap, lineNumbers } from "@codemirror/view";
 import { EditorState } from "@codemirror/state";
 import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
 import { sql, PostgreSQL } from "@codemirror/lang-sql";
+import { syntaxHighlighting, HighlightStyle } from "@codemirror/language";
+import { tags } from "@lezer/highlight";
 import { useEditorStore } from "../stores/editorStore";
 import type { RunController } from "../hooks/useRunController";
 
 interface EditorProps {
   controller: RunController;
 }
+
+const sqlHighlightStyle = HighlightStyle.define([
+  { tag: tags.keyword, color: "#569cd6" },
+  { tag: tags.operator, color: "#569cd6" },
+  { tag: tags.string, color: "#ce9178" },
+  { tag: tags.number, color: "#b5cea8" },
+  { tag: tags.comment, color: "#6a9955", fontStyle: "italic" },
+  { tag: tags.name, color: "#9cdcfe" },
+  { tag: tags.typeName, color: "#4ec9b0" },
+  { tag: tags.null, color: "#569cd6" },
+  { tag: tags.bool, color: "#569cd6" },
+  { tag: tags.punctuation, color: "#d4d4d4" },
+]);
 
 export function Editor({ controller }: EditorProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -46,6 +61,7 @@ export function Editor({ controller }: EditorProps) {
         ]),
         lineNumbers(),
         sql({ dialect: PostgreSQL }),
+        syntaxHighlighting(sqlHighlightStyle),
         syncToStore,
         EditorView.theme({
           "&": { height: "100%" },
