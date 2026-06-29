@@ -323,7 +323,7 @@ Write a Playwright test: create a table, trigger a hard-stop (simulate a stuck w
 
 ---
 
-## US-43 — E2E test: large SELECT enforces row cap
+~~## US-43 — E2E test: large SELECT enforces row cap~~
 Write a Playwright test: run a query that would return more than 10 000 rows (e.g. generate a large series), assert the "Showing first N of M rows" banner appears and the page does not crash or exceed a memory threshold.
 
 **Acceptance:** Banner renders; browser tab does not crash; memory stays within an acceptable range.
