@@ -7,6 +7,17 @@ export default defineConfig({
   worker: {
     format: "es",
   },
+  build: {
+    rolldownOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes("@codemirror")) {
+            return "codemirror";
+          }
+        },
+      },
+    },
+  },
   test: {
     include: ["__tests__/**/*.test.{ts,tsx}"],
     environment: "jsdom",
