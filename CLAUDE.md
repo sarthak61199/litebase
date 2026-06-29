@@ -9,6 +9,7 @@ npm run dev          # start dev server on port 3000
 npm run build        # tsc -b + vite build → dist/
 npm run test         # vitest run (all tests)
 npm run test:coverage # vitest run --coverage (must pass 80% gate)
+npm run test:e2e     # playwright test (requires built app; webServer auto-starts preview)
 ```
 
 Run a single test file:
@@ -43,6 +44,8 @@ React UI → DBClient (main thread) → WorkerRpc → Web Worker → PGlite (mem
 | Bindings | `src/db/bindings.ts` | `bindClientToStores(client)` — subscribes to DBClient events and routes to Zustand stores |
 | Stores | `src/stores/` | Zustand stores: `engineStore` (status), `resultStore` (phase/result/error), `editorStore` (sql), `settingsStore` (timeoutMs) |
 | Run hook | `src/hooks/useRunController.ts` | `useRunController(client)` — reads sql+timeoutMs from stores, delegates to `client.run`/`client.cancel` |
+| Components | `src/components/` | `Editor` (CodeMirror 6 + SQL dialect), `ResultsTable` (virtualized via `@tanstack/react-virtual`), `Toolbar` (run/cancel/status/timeout) |
+| App | `src/app.tsx` | Instantiates `WorkerRpc`+`DBClient`, calls `bindClientToStores`, mounts layout + hard-stop banner |
 
 ### Cancellation strategy (the core design)
 
@@ -53,7 +56,7 @@ Two effective layers (US-46 removed layer 2 — `statement_timeout` is a complet
 
 ### `DBClient` events
 
-`DBClient` is store-agnostic and communicates via typed events. Future `src/db/bindings.ts` is the single place that subscribes to these events and routes to Zustand stores:
+`DBClient` is store-agnostic and communicates via typed events. `src/db/bindings.ts` is the single place that subscribes to these events and routes to Zustand stores:
 
 ```
 engine:booting | engine:ready | engine:restarting | engine:crashed
@@ -76,9 +79,9 @@ Coverage excludes `src/db/rpc/protocol.ts`, `src/main.tsx`, `src/vite-env.d.ts`.
 
 ## Remaining work (USER_STORIES.md)
 
-The entire `src/db/` layer, Zustand stores, `bindings.ts`, and `useRunController` are complete and tested. `src/app.tsx` is still a stub. What remains:
+Everything through E2E tests is complete. Only deploy tasks remain:
 
-- **UI components** (US-20–24): CodeMirror SQL editor, virtualized results table, toolbar, App layout/global styles, hard-stop warning
-- **Component tests** (US-32–34): Toolbar, ResultsTable, editor keyboard shortcut
-- **E2E tests** (US-39–43): boot→query, cancel/recover, timeout recovery, force-stop DB reset, row-cap enforcement
-- **Deploy** (US-44–45): S3 upload with correct content types, CloudFront invalidation
+- **Deploy** (US-44–45): S3 upload with correct MIME/cache-control headers; CloudFront invalidation of `index.html`
+
+### Build notes
+CodeMirror is split into its own `codemirror` chunk via `manualChunks` in `vite.config.ts` to keep the main bundle small. `.wasm` files from PGlite need `application/wasm` content type on S3 for `instantiateStreaming` to work.

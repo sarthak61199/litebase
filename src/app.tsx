@@ -1,12 +1,15 @@
-import { useEffect } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { DBClient } from './db/client';
 import { WorkerRpc } from './db/rpc/client';
 import { bindClientToStores } from './db/bindings';
 import { useRunController } from './hooks/useRunController';
 import { useEngineStore } from './stores/engineStore';
-import { Editor } from './components/Editor';
 import { ResultsTable } from './components/ResultsTable';
 import { Toolbar } from './components/Toolbar';
+
+const Editor = lazy(() =>
+  import('./components/Editor').then((m) => ({ default: m.Editor })),
+);
 
 const rpc = new WorkerRpc(
   () => new Worker(new URL('./db/worker.ts', import.meta.url), { type: 'module' }),
@@ -42,7 +45,9 @@ export function App() {
       <div className="flex flex-col flex-1 min-h-0">
         {/* Editor panel */}
         <div className="h-[38%] min-h-0 p-2 pb-0">
-          <Editor controller={controller} />
+          <Suspense fallback={<div className="h-full rounded bg-gray-900" />}>
+            <Editor controller={controller} />
+          </Suspense>
         </div>
 
         {/* Divider */}

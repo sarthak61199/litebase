@@ -14,6 +14,12 @@ export default defineConfig({
           if (id.includes("@codemirror")) {
             return "codemirror";
           }
+          if (
+            id.includes("node_modules/react/") ||
+            id.includes("node_modules/react-dom/")
+          ) {
+            return "vendor";
+          }
         },
       },
     },
