@@ -19,8 +19,9 @@ type CallFn = (
 function makeMockRpc() {
   const call = vi.fn<CallFn>();
   const restart = vi.fn<() => void>();
-  const rpc = { call, restart } as unknown as WorkerRpc;
-  return { rpc, call, restart };
+  const whenReady = vi.fn<() => Promise<void>>().mockResolvedValue(undefined);
+  const rpc = { call, restart, whenReady } as unknown as WorkerRpc;
+  return { rpc, call, restart, whenReady };
 }
 
 function hangUntilAbort(signal?: AbortSignal): Promise<never> {

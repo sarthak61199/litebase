@@ -27,19 +27,25 @@ export function createHandlers(db: PGlite): Handlers {
     async query({ sql, rowCapOverride }) {
       const cap = rowCapOverride ?? DEFAULT_ROW_CAP;
       try {
-        const result = await db.query<unknown[]>(sql, [], { rowMode: "array" });
-        const rows = result.rows as unknown[][];
+        // db.exec() is used instead of db.query() to avoid a browser PGlite
+        // WASM hang: db.query() awaits _cleanupBlob() before syncToFs(), which
+        // causes DDL statements to never resolve because catalog writes make the
+        // blob extraction extremely slow. db.exec() fires _cleanupBlob() without
+        // awaiting it, so syncToFs() runs against the pre-cleanup FS state and
+        // completes quickly for both SELECT and DDL.
+        const [result] = await db.exec(sql, { rowMode: "array" });
+        const rows = (result?.rows ?? []) as unknown[][];
         const totalRows = rows.length;
         const capped = totalRows > cap;
         return {
-          fields: result.fields.map((f) => ({
+          fields: (result?.fields ?? []).map((f) => ({
             name: f.name,
             dataTypeID: f.dataTypeID,
           })),
           rows: capped ? rows.slice(0, cap) : rows,
           totalRows,
           capped,
-          affectedRows: result.affectedRows,
+          affectedRows: result?.affectedRows,
         };
       } catch (err) {
         liftPgError(err);

@@ -4,6 +4,7 @@ import type { RpcMessage } from '../../../src/db/rpc/shared';
 
 class FakeWorker implements WorkerLike {
   onmessage: ((event: MessageEvent) => void) | null = null;
+  onerror: ((event: ErrorEvent) => void) | null = null;
   messages: unknown[] = [];
   terminated = false;
 

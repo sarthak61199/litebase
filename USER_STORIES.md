@@ -316,7 +316,7 @@ Write a Playwright test: set the timeout to a low value (e.g. 500 ms), run a `pg
 
 ---
 
-## US-42 — E2E test: force-stop resets DB with warning
+~~## US-42 — E2E test: force-stop resets DB with warning~~
 Write a Playwright test: create a table, trigger a hard-stop (simulate a stuck worker), assert the reset warning appears, wait for ready, then assert the previously created table is gone.
 
 **Acceptance:** Warning appears during restart; table is absent after ready.

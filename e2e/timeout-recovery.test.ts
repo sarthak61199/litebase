@@ -38,6 +38,6 @@ test("US-41: query timeout triggers and app recovers", async ({ page }) => {
 
   await page.getByRole("button", { name: "Run" }).click();
 
-  await expect(page.getByText("answer")).toBeVisible({ timeout: 10_000 });
-  await expect(page.getByText("42")).toBeVisible();
+  await expect(page.getByText("answer", { exact: true })).toBeVisible({ timeout: 10_000 });
+  await expect(page.locator("span.text-gray-300").getByText("42", { exact: true })).toBeVisible();
 });

@@ -48,6 +48,11 @@ export class DBClient {
 
   async boot(): Promise<void> {
     this.emit({ type: 'engine:booting' });
+    // Wait for the worker to actually register its message handler before
+    // declaring the engine ready. Emitting ready early lets the UI send a
+    // query into a worker that isn't serving yet; that request is dropped and
+    // hangs forever.
+    await this.rpc.whenReady();
     this.emit({ type: 'engine:ready' });
   }
 
@@ -116,6 +121,12 @@ export class DBClient {
     } catch {
       this.emit({ type: 'engine:restarting' });
       this.rpc.restart();
+      // Wait for the freshly spawned worker to finish WASM initialisation and
+      // register its message handler before emitting ready. Without this, the
+      // next query can be posted into a worker that isn't serving yet and hang
+      // forever. The restarting state stays visible for the full respawn, which
+      // also gives React/Playwright time to observe it.
+      await this.rpc.whenReady();
       this.emit({ type: 'engine:ready' });
       this.restarting = false;
     }

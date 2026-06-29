@@ -12,6 +12,7 @@ export interface WorkerLike {
   postMessage(msg: unknown): void;
   terminate(): void;
   onmessage: ((event: MessageEvent) => void) | null;
+  onerror: ((event: ErrorEvent) => void) | null;
 }
 
 export class WorkerRpc {
@@ -20,18 +21,44 @@ export class WorkerRpc {
   private pending = new Map<string, PendingCall>();
   private generation = 0;
   private nextId = 0;
+  private ready!: Promise<void>;
+  private resolveReady!: () => void;
 
   constructor(spawn: () => WorkerLike) {
     this.spawn = spawn;
     this.worker = this.spawnWorker();
   }
 
+  /**
+   * Resolves when the current worker has posted its `{ type: 'ready' }`
+   * signal, meaning it has registered its message handler and is serving
+   * requests. Callers MUST await this before sending the first request after a
+   * spawn or restart — a request posted before the worker is serving is
+   * silently dropped and its promise never settles.
+   */
+  whenReady(): Promise<void> {
+    return this.ready;
+  }
+
   private spawnWorker(): WorkerLike {
+    this.ready = new Promise<void>((resolve) => {
+      this.resolveReady = resolve;
+    });
     const gen = this.generation;
     const worker = this.spawn();
-    worker.onmessage = (event: MessageEvent<RpcMessage>) => {
+    worker.onmessage = (event: MessageEvent<RpcMessage | { type: 'ready' }>) => {
       if (gen !== this.generation) return;
-      this.handleMessage(event.data);
+      const data = event.data;
+      if (data && (data as { type?: string }).type === 'ready') {
+        this.resolveReady();
+        return;
+      }
+      this.handleMessage(data as RpcMessage);
+    };
+    // Reject all pending calls if the worker crashes so they don't hang forever.
+    worker.onerror = () => {
+      if (gen !== this.generation) return;
+      this.rejectAll(new Error('Worker crashed'));
     };
     return worker;
   }
