@@ -63,25 +63,32 @@ export function Editor({ controller }: EditorProps) {
         sql({ dialect: PostgreSQL }),
         syntaxHighlighting(sqlHighlightStyle),
         syncToStore,
-        EditorView.theme({
-          "&": { height: "100%" },
-          ".cm-scroller": {
-            fontFamily: "ui-monospace, monospace",
-            fontSize: "14px",
-            overflow: "auto",
+        EditorView.theme(
+          {
+            "&": { height: "100%" },
+            ".cm-scroller": {
+              fontFamily: "ui-monospace, monospace",
+              fontSize: "14px",
+              overflow: "auto",
+            },
+            ".cm-gutters": {
+              backgroundColor: "#171717",
+              borderRight: "1px solid #404040",
+            },
+            ".cm-lineNumbers .cm-gutterElement": {
+              color: "#525252",
+              fontFamily: "ui-monospace, monospace",
+              fontSize: "14px",
+              paddingLeft: "12px",
+              paddingRight: "8px",
+            },
+            ".cm-cursor, .cm-dropCursor": {
+              borderLeftColor: "#ffffff",
+              borderLeftWidth: "2px",
+            },
           },
-          ".cm-gutters": {
-            backgroundColor: "#171717",
-            borderRight: "1px solid #404040",
-          },
-          ".cm-lineNumbers .cm-gutterElement": {
-            color: "#525252",
-            fontFamily: "ui-monospace, monospace",
-            fontSize: "14px",
-            paddingLeft: "12px",
-            paddingRight: "8px",
-          },
-        }),
+          { dark: true },
+        ),
       ],
     });
 
