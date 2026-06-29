@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { EditorView, keymap } from "@codemirror/view";
+import { EditorView, keymap, lineNumbers } from "@codemirror/view";
 import { EditorState } from "@codemirror/state";
 import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
 import { sql, PostgreSQL } from "@codemirror/lang-sql";
@@ -44,6 +44,7 @@ export function Editor({ controller }: EditorProps) {
           ...defaultKeymap,
           ...historyKeymap,
         ]),
+        lineNumbers(),
         sql({ dialect: PostgreSQL }),
         syncToStore,
         EditorView.theme({
@@ -52,6 +53,17 @@ export function Editor({ controller }: EditorProps) {
             fontFamily: "ui-monospace, monospace",
             fontSize: "14px",
             overflow: "auto",
+          },
+          ".cm-gutters": {
+            backgroundColor: "#171717",
+            borderRight: "1px solid #404040",
+          },
+          ".cm-lineNumbers .cm-gutterElement": {
+            color: "#525252",
+            fontFamily: "ui-monospace, monospace",
+            fontSize: "14px",
+            paddingLeft: "12px",
+            paddingRight: "8px",
           },
         }),
       ],
