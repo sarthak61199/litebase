@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import { EditorView, keymap, lineNumbers } from "@codemirror/view";
 import { EditorState } from "@codemirror/state";
 import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
@@ -30,7 +30,9 @@ export function Editor({ controller }: EditorProps) {
   const viewRef = useRef<EditorView | null>(null);
 
   const controllerRef = useRef(controller);
-  controllerRef.current = controller;
+  useLayoutEffect(() => {
+    controllerRef.current = controller;
+  });
 
   const setSql = useEditorStore((s) => s.setSql);
   const sql_ = useEditorStore((s) => s.sql);
