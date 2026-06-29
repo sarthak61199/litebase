@@ -43,6 +43,7 @@ vi.mock('@codemirror/view', () => {
         return { type: 'keymap' };
       },
     },
+    lineNumbers: vi.fn(() => ({ type: 'lineNumbers' })),
   };
 });
 

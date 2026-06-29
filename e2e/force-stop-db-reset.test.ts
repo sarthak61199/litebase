@@ -76,9 +76,11 @@ test("US-42: force-stop resets DB and shows warning", async ({ page }) => {
     "in-memory database has been wiped"
   );
 
-  // Step 5: wait for the engine to finish restarting and become ready again
+  // Step 5: wait for the engine to finish restarting and become ready again.
+  // The alert persists after recovery (hadRestart stays true) to keep warning
+  // the user that their tables were wiped.
   await expect(page.getByText("Ready")).toBeVisible({ timeout: 10_000 });
-  await expect(page.getByRole("alert")).not.toBeVisible();
+  await expect(page.getByRole("alert")).toBeVisible();
 
   // Step 6: verify the sentinel table is gone — hard-stop wiped the memory:// DB.
   // With timeout=0, the query waits indefinitely (table not found = instant error).
